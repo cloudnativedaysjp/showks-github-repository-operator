@@ -27,6 +27,48 @@ import (
 type GitHubSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	Repository       RepositorySpec       `json:"repository"`
+	BranchProtection BranchProtectionSpec `json:"branchProtection"`
+	Webhooks         []WebhookSpec        `json:"webhooks,omitempty"`
+}
+
+type RepositorySpec struct {
+	Org           string   `json:"org"`
+	Name          string   `json:"name"`
+	TeamID        string   `json:"teamID,omitempty"`
+	Collaborators []string `json:"collaborators,omitempty"`
+}
+
+type BranchProtectionSpec struct {
+	RequiredStatusChecks       RequiredStatusChecksSpec       `json:"requiredStatusChecks"`
+	EnforceAdmin               bool                           `json:"enforceAdmin,omitempty"`
+	RequiredPullRequestReviews RequiredPullRequestReviewsSpec `json:"requiredPullRequestReviews,omitempty"`
+	Restrictions               RestrictionsSpec               `json:"restrictions,omitempty"`
+}
+
+type RequiredPullRequestReviewsSpec struct {
+}
+
+type RequiredStatusChecksSpec struct {
+	Strict   bool     `json:"strict,omitempty"`
+	Contexts []string `json:"contexts,omitempty"`
+}
+
+type RestrictionsSpec struct {
+	Users []string `json:"users,omitempty"`
+	Teams []string `json:"teams,omitempty"`
+}
+
+type WebhookSpec struct {
+	Name   string            `json:"name"`
+	Config WebhookConfigSpec `json:"config,omitempty"`
+	Events []string          `json:"events,omitempty"`
+	Avtibe bool              `json:"active,omitempty"`
+}
+
+type WebhookConfigSpec struct {
+	Url         string `json:"url"`
+	ContentType string `json:"contentType"`
 }
 
 // GitHubStatus defines the observed state of GitHub

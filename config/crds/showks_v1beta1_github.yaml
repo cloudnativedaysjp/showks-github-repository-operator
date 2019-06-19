@@ -27,6 +27,82 @@ spec:
         metadata:
           type: object
         spec:
+          properties:
+            branchProtection:
+              properties:
+                enforceAdmin:
+                  type: boolean
+                requiredPullRequestReviews:
+                  type: object
+                requiredStatusChecks:
+                  properties:
+                    contexts:
+                      items:
+                        type: string
+                      type: array
+                    strict:
+                      type: boolean
+                  type: object
+                restrictions:
+                  properties:
+                    teams:
+                      items:
+                        type: string
+                      type: array
+                    users:
+                      items:
+                        type: string
+                      type: array
+                  type: object
+              required:
+              - requiredStatusChecks
+              type: object
+            repository:
+              description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+                Important: Run "make" to regenerate code after modifying this file'
+              properties:
+                collaborators:
+                  items:
+                    type: string
+                  type: array
+                name:
+                  type: string
+                org:
+                  type: string
+                teamID:
+                  type: string
+              required:
+              - org
+              - name
+              type: object
+            webhooks:
+              items:
+                properties:
+                  active:
+                    type: boolean
+                  config:
+                    properties:
+                      contentType:
+                        type: string
+                      url:
+                        type: string
+                    required:
+                    - url
+                    - contentType
+                    type: object
+                  events:
+                    items:
+                      type: string
+                    type: array
+                  name:
+                    type: string
+                required:
+                - name
+                type: object
+              type: array
+          required:
+          - repository
+          - branchProtection
           type: object
         status:
           type: object
