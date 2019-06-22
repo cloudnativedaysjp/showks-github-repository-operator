@@ -17,13 +17,16 @@ limitations under the License.
 package github
 
 import (
+	"github.com/cloudnativedaysjp/showks-github-repository-operator/pkg/gh"
+	"github.com/cloudnativedaysjp/showks-github-repository-operator/pkg/mock"
+	"github.com/golang/mock/gomock"
+	"github.com/google/go-github/github"
 	"testing"
 	"time"
 
 	showksv1beta1 "github.com/cloudnativedaysjp/showks-github-repository-operator/pkg/apis/showks/v1beta1"
 	"github.com/onsi/gomega"
 	"golang.org/x/net/context"
-	appsv1 "k8s.io/api/apps/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -39,6 +42,17 @@ var depKey = types.NamespacedName{Name: "foo-deployment", Namespace: "default"}
 
 const timeout = time.Second * 5
 
+var org = "sample"
+var repoName = "aaa"
+
+func newGitHubClientMock(controller *gomock.Controller) gh.GitHubClientInterface {
+	c := mock_gh.NewMockGitHubClientInterface(controller)
+	repo := &github.Repository{Name: &repoName}
+	c.EXPECT().CreateRepository(org, repo).Return(repo, nil)
+
+	return c
+}
+
 func TestReconcile(t *testing.T) {
 	g := gomega.NewGomegaWithT(t)
 	instance := &showksv1beta1.GitHub{ObjectMeta: metav1.ObjectMeta{Name: "foo", Namespace: "default"}}
@@ -49,7 +63,11 @@ func TestReconcile(t *testing.T) {
 	g.Expect(err).NotTo(gomega.HaveOccurred())
 	c = mgr.GetClient()
 
-	recFn, requests := SetupTestReconcile(newReconciler(mgr))
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	ghClient := newGitHubClientMock(mockCtrl)
+	recFn, requests := SetupTestReconcile(newReconciler(mgr, ghClient))
 	g.Expect(add(mgr, recFn)).NotTo(gomega.HaveOccurred())
 
 	stopMgr, mgrStopped := StartTestManager(mgr, g)
@@ -71,18 +89,18 @@ func TestReconcile(t *testing.T) {
 	defer c.Delete(context.TODO(), instance)
 	g.Eventually(requests, timeout).Should(gomega.Receive(gomega.Equal(expectedRequest)))
 
-	deploy := &appsv1.Deployment{}
-	g.Eventually(func() error { return c.Get(context.TODO(), depKey, deploy) }, timeout).
-		Should(gomega.Succeed())
+	//deploy := &appsv1.Deployment{}
+	//g.Eventually(func() error { return c.Get(context.TODO(), depKey, deploy) }, timeout).
+	//	Should(gomega.Succeed())
 
 	// Delete the Deployment and expect Reconcile to be called for Deployment deletion
-	g.Expect(c.Delete(context.TODO(), deploy)).NotTo(gomega.HaveOccurred())
-	g.Eventually(requests, timeout).Should(gomega.Receive(gomega.Equal(expectedRequest)))
-	g.Eventually(func() error { return c.Get(context.TODO(), depKey, deploy) }, timeout).
-		Should(gomega.Succeed())
+	//g.Expect(c.Delete(context.TODO(), deploy)).NotTo(gomega.HaveOccurred())
+	//g.Eventually(requests, timeout).Should(gomega.Receive(gomega.Equal(expectedRequest)))
+	//g.Eventually(func() error { return c.Get(context.TODO(), depKey, deploy) }, timeout).
+	//	Should(gomega.Succeed())
 
 	// Manually delete Deployment since GC isn't enabled in the test control plane
-	g.Eventually(func() error { return c.Delete(context.TODO(), deploy) }, timeout).
-		Should(gomega.MatchError("deployments.apps \"foo-deployment\" not found"))
+	//g.Eventually(func() error { return c.Delete(context.TODO(), deploy) }, timeout).
+	//	Should(gomega.MatchError("deployments.apps \"foo-deployment\" not found"))
 
 }
