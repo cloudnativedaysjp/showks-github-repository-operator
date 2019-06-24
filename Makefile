@@ -43,6 +43,7 @@ ifndef GOPATH
 	$(error GOPATH not defined, please define GOPATH. Run "go help gopath" to learn more about GOPATH)
 endif
 	go generate ./pkg/... ./cmd/...
+	mockgen -source ./pkg/gh/gh.go  -destination ./pkg/mock/gh_mock.go
 
 # Build the docker image
 docker-build: test

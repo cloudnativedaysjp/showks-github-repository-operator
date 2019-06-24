@@ -38,17 +38,22 @@ import (
 var c client.Client
 
 var expectedRequest = reconcile.Request{NamespacedName: types.NamespacedName{Name: "foo", Namespace: "default"}}
-var depKey = types.NamespacedName{Name: "foo-deployment", Namespace: "default"}
+var repoKey = types.NamespacedName{Name: "foo", Namespace: "default"}
 
 const timeout = time.Second * 5
 
 var org = "sample"
 var repoName = "aaa"
+var repoID int64 = 1296269
 
 func newGitHubClientMock(controller *gomock.Controller) gh.GitHubClientInterface {
 	c := mock_gh.NewMockGitHubClientInterface(controller)
-	repo := &github.Repository{Name: &repoName}
-	c.EXPECT().CreateRepository(org, repo).Return(repo, nil)
+	repoSpec := &github.Repository{Name: &repoName}
+	repoResp := &github.Repository{ID: &repoID, Name: &repoName}
+	c.EXPECT().CreateRepository(org, repoSpec).Return(repoResp, nil).Times(1)
+
+	firstGetRepo := c.EXPECT().GetRepository(org, repoName).Return(nil, &gh.NotFoundError{}).Times(1)
+	c.EXPECT().GetRepository(org, repoName).Return(repoResp, nil).After(firstGetRepo).Times(1)
 
 	return c
 }
@@ -104,12 +109,14 @@ func TestReconcile(t *testing.T) {
 	//g.Eventually(func() error { return c.Get(context.TODO(), depKey, deploy) }, timeout).
 	//	Should(gomega.Succeed())
 
+	repo := &showksv1beta1.GitHub{}
 	// Delete the Deployment and expect Reconcile to be called for Deployment deletion
 	//g.Expect(c.Delete(context.TODO(), deploy)).NotTo(gomega.HaveOccurred())
 	//g.Eventually(requests, timeout).Should(gomega.Receive(gomega.Equal(expectedRequest)))
-	//g.Eventually(func() error { return c.Get(context.TODO(), depKey, deploy) }, timeout).
-	//	Should(gomega.Succeed())
+	g.Eventually(func() error { return c.Get(context.TODO(), repoKey, repo) }, timeout).
+		Should(gomega.Succeed())
 
+	g.Expect(repo.Status.ID).To(gomega.Equal(repoID))
 	// Manually delete Deployment since GC isn't enabled in the test control plane
 	//g.Eventually(func() error { return c.Delete(context.TODO(), deploy) }, timeout).
 	//	Should(gomega.MatchError("deployments.apps \"foo-deployment\" not found"))

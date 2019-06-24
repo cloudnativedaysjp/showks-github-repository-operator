@@ -47,3 +47,18 @@ func (mr *MockGitHubClientInterfaceMockRecorder) CreateRepository(org, repo inte
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRepository", reflect.TypeOf((*MockGitHubClientInterface)(nil).CreateRepository), org, repo)
 }
+
+// GetRepository mocks base method
+func (m *MockGitHubClientInterface) GetRepository(org, repo string) (*github.Repository, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRepository", org, repo)
+	ret0, _ := ret[0].(*github.Repository)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRepository indicates an expected call of GetRepository
+func (mr *MockGitHubClientInterfaceMockRecorder) GetRepository(org, repo interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRepository", reflect.TypeOf((*MockGitHubClientInterface)(nil).GetRepository), org, repo)
+}
