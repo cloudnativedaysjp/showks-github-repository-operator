@@ -55,7 +55,18 @@ func newGitHubClientMock(controller *gomock.Controller) gh.GitHubClientInterface
 
 func TestReconcile(t *testing.T) {
 	g := gomega.NewGomegaWithT(t)
-	instance := &showksv1beta1.GitHub{ObjectMeta: metav1.ObjectMeta{Name: "foo", Namespace: "default"}}
+	instance := &showksv1beta1.GitHub{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "foo",
+			Namespace: "default",
+		},
+		Spec: showksv1beta1.GitHubSpec{
+			Repository: showksv1beta1.RepositorySpec{
+				Org:  org,
+				Name: repoName,
+			},
+		},
+	}
 
 	// Setup the Manager and Controller.  Wrap the Controller Reconcile function so it writes each request to a
 	// channel when it is finished.

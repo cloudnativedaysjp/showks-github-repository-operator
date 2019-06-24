@@ -110,10 +110,8 @@ func (r *ReconcileGitHub) Reconcile(request reconcile.Request) (reconcile.Result
 		return reconcile.Result{}, err
 	}
 
-	org := "sample"
-	repoName := "aaa"
-	repo := &github.Repository{Name: &repoName}
-	_, err = r.ghClient.CreateRepository(org, repo)
+	repo := &github.Repository{Name: &instance.Spec.Repository.Name}
+	_, err = r.ghClient.CreateRepository(instance.Spec.Repository.Org, repo)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
