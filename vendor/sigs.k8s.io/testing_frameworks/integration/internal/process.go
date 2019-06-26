@@ -124,6 +124,8 @@ func (ps *ProcessState) Start(stdout, stderr io.Writer) (err error) {
 		stderr = safeMultiWriter(stderr, startDetectStream)
 	}
 
+	fmt.Println("!!!!!!!!!!!!!! gexec.Start")
+	fmt.Printf("%+v\n", command)
 	ps.Session, err = gexec.Start(command, stdout, stderr)
 	if err != nil {
 		return err
