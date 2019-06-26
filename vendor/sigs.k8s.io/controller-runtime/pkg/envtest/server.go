@@ -136,7 +136,7 @@ func (te *Environment) Start() (*rest.Config, error) {
 	} else {
 		te.ControlPlane = integration.ControlPlane{}
 		te.ControlPlane.APIServer = &integration.APIServer{Args: te.getAPIServerFlags()}
-		te.ControlPlane.Etcd = &integration.Etcd{Out: os.Stdout, Err: os.Stderr}
+		te.ControlPlane.Etcd = &integration.Etcd{Out: os.Stdout, Err: os.Stdout}
 
 		if os.Getenv(envKubeAPIServerBin) == "" {
 			te.ControlPlane.APIServer.Path = defaultAssetPath("kube-apiserver")
