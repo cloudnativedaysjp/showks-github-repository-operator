@@ -20,6 +20,7 @@ import (
 	stdlog "log"
 	"os"
 	"path/filepath"
+	"sigs.k8s.io/testing_frameworks/integration"
 	"sync"
 	"testing"
 
@@ -37,6 +38,12 @@ var cfg *rest.Config
 func TestMain(m *testing.M) {
 	t := &envtest.Environment{
 		CRDDirectoryPaths: []string{filepath.Join("..", "..", "..", "config", "crds")},
+		ControlPlane: integration.ControlPlane {
+			Etcd: &integration.Etcd {
+				Out: os.Stdout,
+				Err: os.Stderr,
+			},
+		},
 	}
 	apis.AddToScheme(scheme.Scheme)
 
