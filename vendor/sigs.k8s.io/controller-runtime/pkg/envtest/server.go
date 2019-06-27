@@ -120,6 +120,7 @@ func (te Environment) getAPIServerFlags() []string {
 
 // Start starts a local Kubernetes server and updates te.ApiserverPort with the port it is listening on
 func (te *Environment) Start() (*rest.Config, error) {
+	fmt.Println("!!!!! Environment.Start")
 	if te.UseExistingCluster {
 		log.V(1).Info("using existing cluster")
 		if te.Config == nil {
@@ -136,10 +137,7 @@ func (te *Environment) Start() (*rest.Config, error) {
 	} else {
 		te.ControlPlane = integration.ControlPlane{}
 		te.ControlPlane.APIServer = &integration.APIServer{Args: te.getAPIServerFlags()}
-		te.ControlPlane.Etcd = &integration.Etcd{Out: os.Stdout, Err: os.Stdout, Args: []string{"--debug"	, "--listen-peer-urls=http://localhost:0",
-			"--advertise-client-urls={{ if .URL }}{{ .URL.String }}{{ end }}",
-			"--listen-client-urls={{ if .URL }}{{ .URL.String }}{{ end }}",
-			"--data-dir={{ .DataDir }}",}}
+		te.ControlPlane.Etcd = &integration.Etcd{Out: os.Stdout, Err: os.Stdout}
 
 		if os.Getenv(envKubeAPIServerBin) == "" {
 			te.ControlPlane.APIServer.Path = defaultAssetPath("kube-apiserver")
@@ -182,6 +180,7 @@ func (te *Environment) Start() (*rest.Config, error) {
 }
 
 func (te *Environment) startControlPlane() error {
+	fmt.Println("!!!!! Environment.startControlPlane")
 	numTries, maxRetries := 0, 5
 	var err error
 	for ; numTries < maxRetries; numTries++ {

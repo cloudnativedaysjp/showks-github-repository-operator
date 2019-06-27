@@ -17,6 +17,7 @@ limitations under the License.
 package github
 
 import (
+	"fmt"
 	stdlog "log"
 	"os"
 	"path/filepath"
@@ -36,6 +37,7 @@ import (
 var cfg *rest.Config
 
 func TestMain(m *testing.M) {
+	fmt.Println("!!!!! TestMain")
 	t := &envtest.Environment{
 		CRDDirectoryPaths: []string{filepath.Join("..", "..", "..", "config", "crds")},
 		ControlPlane: integration.ControlPlane {
