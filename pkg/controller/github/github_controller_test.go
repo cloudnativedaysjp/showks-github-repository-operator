@@ -17,6 +17,7 @@ limitations under the License.
 package github
 
 import (
+	"context"
 	"github.com/cloudnativedaysjp/showks-github-repository-operator/pkg/gh"
 	"github.com/cloudnativedaysjp/showks-github-repository-operator/pkg/mock"
 	"github.com/golang/mock/gomock"
@@ -26,7 +27,6 @@ import (
 
 	showksv1beta1 "github.com/cloudnativedaysjp/showks-github-repository-operator/pkg/apis/showks/v1beta1"
 	"github.com/onsi/gomega"
-	"golang.org/x/net/context"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"

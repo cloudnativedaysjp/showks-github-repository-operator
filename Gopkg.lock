@@ -474,24 +474,6 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:f0b37118f0f8ab50f5ab1720c27a73ee27e4cb6ae7e99c4a3b65e7921401415c"
-  name = "golang.org/x/net"
-  packages = [
-    "context",
-    "context/ctxhttp",
-    "html",
-    "html/atom",
-    "html/charset",
-    "http/httpguts",
-    "http2",
-    "http2/hpack",
-    "idna",
-  ]
-  pruneopts = "T"
-  revision = "d28f0bde5980168871434b95cfc858db9f2a7a99"
-
-[[projects]]
-  branch = "master"
   digest = "1:5c4903dc027aa1eb2d6f1e5c85754f353eff2f99874e987dbeccda17e58e84b8"
   name = "golang.org/x/oauth2"
   packages = [
@@ -959,7 +941,6 @@
     "github.com/google/go-github/github",
     "github.com/onsi/ginkgo",
     "github.com/onsi/gomega",
-    "golang.org/x/net/context",
     "k8s.io/api/apps/v1",
     "k8s.io/api/core/v1",
     "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1",
