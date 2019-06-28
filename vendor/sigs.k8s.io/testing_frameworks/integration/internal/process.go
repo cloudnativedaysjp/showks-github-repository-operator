@@ -124,8 +124,6 @@ func (ps *ProcessState) Start(stdout, stderr io.Writer) (err error) {
 		stderr = safeMultiWriter(stderr, startDetectStream)
 	}
 
-	fmt.Println("!!!!!!!!!!!!!! gexec.Start")
-	fmt.Printf("%+v\n", command)
 	ps.Session, err = gexec.Start(command, stdout, stderr)
 	if err != nil {
 		return err
@@ -160,12 +158,7 @@ func pollURLUntilOK(url url.URL, interval time.Duration, ready chan bool, stopCh
 		interval = 100 * time.Millisecond
 	}
 	for {
-		fmt.Printf("Try to get %s\n", url.String())
 		res, err := http.Get(url.String())
-		if err != nil{
-			fmt.Printf("Failed to get %s: %s\n", url.String(), err)
-		}
-		fmt.Printf("res: %+v\n", res)
 		if err == nil && res.StatusCode == http.StatusOK {
 			ready <- true
 			return

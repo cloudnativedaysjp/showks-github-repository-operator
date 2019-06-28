@@ -16,12 +16,10 @@ type ControlPlane struct {
 
 // Start will start your control plane processes. To stop them, call Stop().
 func (f *ControlPlane) Start() error {
-	fmt.Println("!!!!! ControlPlane.Start")
 	if f.Etcd == nil {
 		f.Etcd = &Etcd{}
 	}
 	if err := f.Etcd.Start(); err != nil {
-		fmt.Printf("Failed to start etcd: %s\n", err)
 		return err
 	}
 

@@ -9940,6 +9940,14 @@ func (r *RepositoryComment) GetID() int64 {
 	return *r.ID
 }
 
+// GetNodeID returns the NodeID field if it's non-nil, zero value otherwise.
+func (r *RepositoryComment) GetNodeID() string {
+	if r == nil || r.NodeID == nil {
+		return ""
+	}
+	return *r.NodeID
+}
+
 // GetPath returns the Path field if it's non-nil, zero value otherwise.
 func (r *RepositoryComment) GetPath() string {
 	if r == nil || r.Path == nil {
@@ -12154,6 +12162,14 @@ func (u *User) GetID() int64 {
 		return 0
 	}
 	return *u.ID
+}
+
+// GetLdapDn returns the LdapDn field if it's non-nil, zero value otherwise.
+func (u *User) GetLdapDn() string {
+	if u == nil || u.LdapDn == nil {
+		return ""
+	}
+	return *u.LdapDn
 }
 
 // GetLocation returns the Location field if it's non-nil, zero value otherwise.
