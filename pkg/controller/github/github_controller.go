@@ -134,6 +134,11 @@ func (r *ReconcileGitHub) Reconcile(request reconcile.Request) (reconcile.Result
 		return reconcile.Result{}, err
 	}
 
+	err = r.ReconcileBranchProtection(instance)
+	if err != nil {
+		return reconcile.Result{}, err
+	}
+
 	return reconcile.Result{}, nil
 }
 
@@ -148,6 +153,25 @@ func (r *ReconcileGitHub) ReconcileCollaborators(instance *showksv1beta1.GitHub)
 		} else {
 			return err
 
+		}
+	}
+
+	return nil
+}
+
+func (r *ReconcileGitHub) ReconcileBranchProtection(instance *showksv1beta1.GitHub) error {
+	owner := instance.Spec.Repository.Org
+	repo := instance.Spec.Repository.Name
+	for _, bpSpec := range instance.Spec.BranchProtections {
+		bp := &github.ProtectionRequest{
+			Restrictions: &github.BranchRestrictionsRequest{
+				Teams: bpSpec.Restrictions.Teams,
+			},
+		}
+
+		_, err := r.ghClient.UpdateBranchProtection(owner, repo, bpSpec.BranchName, bp)
+		if err != nil {
+			return err
 		}
 	}
 
