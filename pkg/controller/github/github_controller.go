@@ -130,7 +130,7 @@ func (r *ReconcileGitHub) Reconcile(request reconcile.Request) (reconcile.Result
 	}
 
 	for _, collaborator := range instance.Spec.Repository.Collaborators {
-		r.ghClient.AddCoraborator(instance.Spec.Repository.Org, instance.Spec.Repository.Name, collaborator.Name, collaborator.Permission)
+		r.ghClient.AddCollaborator(instance.Spec.Repository.Org, instance.Spec.Repository.Name, collaborator.Name, collaborator.Permission)
 	}
 
 	return reconcile.Result{}, nil

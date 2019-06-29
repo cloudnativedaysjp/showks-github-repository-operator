@@ -8,7 +8,7 @@ import (
 type GitHubClientInterface interface {
 	CreateRepository(org string, repo *github.Repository) (*github.Repository, error)
 	GetRepository(org string, repo string) (*github.Repository, error)
-	AddCoraborator(owner string, repo string, user string, permission string) error
+	AddCollaborator(owner string, repo string, user string, permission string) error
 }
 
 func NewClient() GitHubClientInterface {
@@ -38,7 +38,7 @@ func (c *GithubClient) GetRepository(org string, repoName string) (*github.Repos
 	return repo, err
 }
 
-func (c *GithubClient) AddCoraborator(owner string, repo string, user string, permission string) error {
+func (c *GithubClient) AddCollaborator(owner string, repo string, user string, permission string) error {
 	opt := &github.RepositoryAddCollaboratorOptions{Permission: permission}
 	ctx := context.Background()
 	_, err := c.client.Repositories.AddCollaborator(ctx, owner, repo, user, opt)
