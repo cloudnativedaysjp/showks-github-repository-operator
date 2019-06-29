@@ -61,6 +61,11 @@ func newGitHubClientMock(controller *gomock.Controller) gh.GitHubClientInterface
 
 	team := "showks-members"
 	protectionReq := &github.ProtectionRequest{
+		RequiredStatusChecks: &github.RequiredStatusChecks{
+			Strict:   false,
+			Contexts: nil,
+		},
+		EnforceAdmins: false,
 		Restrictions: &github.BranchRestrictionsRequest{
 			Teams: []string{team},
 		},
@@ -91,6 +96,11 @@ func TestReconcile(t *testing.T) {
 			BranchProtections: []showksv1beta1.BranchProtectionSpec{
 				{
 					BranchName: "master",
+					RequiredStatusChecks: showksv1beta1.RequiredStatusChecksSpec{
+						Strict:   false,
+						Contexts: nil,
+					},
+					EnforceAdmin: false,
 					Restrictions: showksv1beta1.RestrictionsSpec{
 						Teams: []string{"showks-members"},
 					},

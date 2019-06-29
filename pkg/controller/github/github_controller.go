@@ -164,6 +164,11 @@ func (r *ReconcileGitHub) ReconcileBranchProtection(instance *showksv1beta1.GitH
 	repo := instance.Spec.Repository.Name
 	for _, bpSpec := range instance.Spec.BranchProtections {
 		bp := &github.ProtectionRequest{
+			RequiredStatusChecks: &github.RequiredStatusChecks{
+				Strict:   bpSpec.RequiredStatusChecks.Strict,
+				Contexts: bpSpec.RequiredStatusChecks.Contexts,
+			},
+			EnforceAdmins: bpSpec.EnforceAdmin,
 			Restrictions: &github.BranchRestrictionsRequest{
 				Teams: bpSpec.Restrictions.Teams,
 			},
