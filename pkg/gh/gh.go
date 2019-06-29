@@ -32,7 +32,7 @@ func (c *GithubClient) GetRepository(org string, repoName string) (*github.Repos
 	repo, resp, err := c.client.Repositories.Get(ctx, org, repoName)
 
 	if resp.Response.StatusCode == 404 {
-		return nil, NotFoundError{}
+		return nil, &NotFoundError{}
 	}
 
 	return repo, err
@@ -47,4 +47,8 @@ func (c *GithubClient) AddCollaborator(owner string, repo string, user string, p
 
 type NotFoundError struct {
 	error
+}
+
+func (e *NotFoundError) Error() string {
+	return e.error.Error()
 }
