@@ -119,7 +119,7 @@ func TestReconcile(t *testing.T) {
 			},
 			Webhooks: []showksv1beta1.WebhookSpec{
 				{
-					Avtibe: true,
+					Active: true,
 					Config: showksv1beta1.WebhookConfigSpec{
 						Url:         "https://example.com",
 						ContentType: "json",

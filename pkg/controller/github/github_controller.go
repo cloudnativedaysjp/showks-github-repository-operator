@@ -198,7 +198,7 @@ func (r *ReconcileGitHub) ReconcileWebHook(instance *showksv1beta1.GitHub) error
 				"content_type": whSpec.Config.ContentType,
 			},
 			Events: whSpec.Events,
-			Active: &whSpec.Avtibe,
+			Active: &whSpec.Active,
 		}
 		fmt.Printf("config: %+v\n", whSpec.Config)
 
