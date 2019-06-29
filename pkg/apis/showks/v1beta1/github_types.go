@@ -75,6 +75,7 @@ type WebhookConfigSpec struct {
 type GitHubStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	ID int64
 }
 
 // +genclient
@@ -82,6 +83,7 @@ type GitHubStatus struct {
 
 // GitHub is the Schema for the githubs API
 // +k8s:openapi-gen=true
+// +kubebuilder:subresource:status
 type GitHub struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
