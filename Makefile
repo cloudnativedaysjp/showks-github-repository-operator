@@ -1,6 +1,6 @@
 
 # Image URL to use all building/pushing image targets
-IMG ?= controller:latest
+IMG ?= rtakaishi/github-repository-operator:latest
 
 all: test manager
 
