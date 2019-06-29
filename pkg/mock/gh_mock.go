@@ -91,3 +91,18 @@ func (mr *MockGitHubClientInterfaceMockRecorder) GetPermissionLevel(owner, repo,
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPermissionLevel", reflect.TypeOf((*MockGitHubClientInterface)(nil).GetPermissionLevel), owner, repo, user)
 }
+
+// UpdateBranchProtection mocks base method
+func (m *MockGitHubClientInterface) UpdateBranchProtection(owner, repo, branch string, request *github.ProtectionRequest) (*github.Protection, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateBranchProtection", owner, repo, branch, request)
+	ret0, _ := ret[0].(*github.Protection)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateBranchProtection indicates an expected call of UpdateBranchProtection
+func (mr *MockGitHubClientInterfaceMockRecorder) UpdateBranchProtection(owner, repo, branch, request interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateBranchProtection", reflect.TypeOf((*MockGitHubClientInterface)(nil).UpdateBranchProtection), owner, repo, branch, request)
+}

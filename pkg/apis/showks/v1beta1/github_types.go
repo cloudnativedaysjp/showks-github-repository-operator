@@ -27,9 +27,9 @@ import (
 type GitHubSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-	Repository       RepositorySpec       `json:"repository"`
-	BranchProtection BranchProtectionSpec `json:"branchProtection"`
-	Webhooks         []WebhookSpec        `json:"webhooks,omitempty"`
+	Repository        RepositorySpec         `json:"repository"`
+	BranchProtections []BranchProtectionSpec `json:"branchProtection,omitempty"`
+	Webhooks          []WebhookSpec          `json:"webhooks,omitempty"`
 }
 
 type RepositorySpec struct {
@@ -45,6 +45,7 @@ type CollaboratorSpec struct {
 }
 
 type BranchProtectionSpec struct {
+	BranchName                 string                         `json:"branchName,omitempty"`
 	RequiredStatusChecks       RequiredStatusChecksSpec       `json:"requiredStatusChecks"`
 	EnforceAdmin               bool                           `json:"enforceAdmin,omitempty"`
 	RequiredPullRequestReviews RequiredPullRequestReviewsSpec `json:"requiredPullRequestReviews,omitempty"`

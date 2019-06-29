@@ -31,34 +31,38 @@ spec:
         spec:
           properties:
             branchProtection:
-              properties:
-                enforceAdmin:
-                  type: boolean
-                requiredPullRequestReviews:
-                  type: object
-                requiredStatusChecks:
-                  properties:
-                    contexts:
-                      items:
-                        type: string
-                      type: array
-                    strict:
-                      type: boolean
-                  type: object
-                restrictions:
-                  properties:
-                    teams:
-                      items:
-                        type: string
-                      type: array
-                    users:
-                      items:
-                        type: string
-                      type: array
-                  type: object
-              required:
-              - requiredStatusChecks
-              type: object
+              items:
+                properties:
+                  branchName:
+                    type: string
+                  enforceAdmin:
+                    type: boolean
+                  requiredPullRequestReviews:
+                    type: object
+                  requiredStatusChecks:
+                    properties:
+                      contexts:
+                        items:
+                          type: string
+                        type: array
+                      strict:
+                        type: boolean
+                    type: object
+                  restrictions:
+                    properties:
+                      teams:
+                        items:
+                          type: string
+                        type: array
+                      users:
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                required:
+                - requiredStatusChecks
+                type: object
+              type: array
             repository:
               description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
                 Important: Run "make" to regenerate code after modifying this file'
@@ -112,7 +116,6 @@ spec:
               type: array
           required:
           - repository
-          - branchProtection
           type: object
         status:
           type: object

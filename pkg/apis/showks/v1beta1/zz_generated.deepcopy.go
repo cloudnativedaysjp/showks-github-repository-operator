@@ -123,7 +123,13 @@ func (in *GitHubList) DeepCopyObject() runtime.Object {
 func (in *GitHubSpec) DeepCopyInto(out *GitHubSpec) {
 	*out = *in
 	in.Repository.DeepCopyInto(&out.Repository)
-	in.BranchProtection.DeepCopyInto(&out.BranchProtection)
+	if in.BranchProtections != nil {
+		in, out := &in.BranchProtections, &out.BranchProtections
+		*out = make([]BranchProtectionSpec, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
+	}
 	if in.Webhooks != nil {
 		in, out := &in.Webhooks, &out.Webhooks
 		*out = make([]WebhookSpec, len(*in))

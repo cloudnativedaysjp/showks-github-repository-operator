@@ -59,6 +59,19 @@ func newGitHubClientMock(controller *gomock.Controller) gh.GitHubClientInterface
 	firstGetPermission := c.EXPECT().GetPermissionLevel(org, repoName, "alice").Return("", &gh.NotFoundError{}).Times(1)
 	c.EXPECT().GetPermissionLevel(org, repoName, "alice").Return("admin", nil).After(firstGetPermission).Times(1)
 
+	team := "showks-members"
+	protectionReq := &github.ProtectionRequest{
+		RequiredStatusChecks: &github.RequiredStatusChecks{
+			Strict:   false,
+			Contexts: nil,
+		},
+		EnforceAdmins: false,
+		Restrictions: &github.BranchRestrictionsRequest{
+			Teams: []string{team},
+		},
+	}
+	protection := &github.Protection{Restrictions: &github.BranchRestrictions{Teams: []*github.Team{{Name: &team}}}}
+	c.EXPECT().UpdateBranchProtection(org, repoName, "master", protectionReq).Return(protection, nil).Times(2)
 	return c
 }
 
@@ -77,6 +90,19 @@ func TestReconcile(t *testing.T) {
 					{
 						Name:       "alice",
 						Permission: "admin",
+					},
+				},
+			},
+			BranchProtections: []showksv1beta1.BranchProtectionSpec{
+				{
+					BranchName: "master",
+					RequiredStatusChecks: showksv1beta1.RequiredStatusChecksSpec{
+						Strict:   false,
+						Contexts: nil,
+					},
+					EnforceAdmin: false,
+					Restrictions: showksv1beta1.RestrictionsSpec{
+						Teams: []string{"showks-members"},
 					},
 				},
 			},
