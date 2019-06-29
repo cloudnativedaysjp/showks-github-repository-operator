@@ -76,3 +76,18 @@ func (mr *MockGitHubClientInterfaceMockRecorder) AddCollaborator(owner, repo, us
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddCollaborator", reflect.TypeOf((*MockGitHubClientInterface)(nil).AddCollaborator), owner, repo, user, permission)
 }
+
+// GetPermissionLevel mocks base method
+func (m *MockGitHubClientInterface) GetPermissionLevel(owner, repo, user string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPermissionLevel", owner, repo, user)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPermissionLevel indicates an expected call of GetPermissionLevel
+func (mr *MockGitHubClientInterfaceMockRecorder) GetPermissionLevel(owner, repo, user interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPermissionLevel", reflect.TypeOf((*MockGitHubClientInterface)(nil).GetPermissionLevel), owner, repo, user)
+}

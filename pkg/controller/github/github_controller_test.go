@@ -56,6 +56,8 @@ func newGitHubClientMock(controller *gomock.Controller) gh.GitHubClientInterface
 	c.EXPECT().GetRepository(org, repoName).Return(repoResp, nil).After(firstGetRepo).Times(1)
 
 	c.EXPECT().AddCollaborator(org, repoName, "alice", "admin").Return(nil).Times(1)
+	firstGetPermission := c.EXPECT().GetPermissionLevel(org, repoName, "alice").Return("", &gh.NotFoundError{}).Times(1)
+	c.EXPECT().GetPermissionLevel(org, repoName, "alice").Return("admin", nil).After(firstGetPermission).Times(1)
 
 	return c
 }

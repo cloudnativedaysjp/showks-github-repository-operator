@@ -130,7 +130,10 @@ func (r *ReconcileGitHub) Reconcile(request reconcile.Request) (reconcile.Result
 	}
 
 	for _, collaborator := range instance.Spec.Repository.Collaborators {
-		r.ghClient.AddCollaborator(instance.Spec.Repository.Org, instance.Spec.Repository.Name, collaborator.Name, collaborator.Permission)
+		_, err := r.ghClient.GetPermissionLevel(instance.Spec.Repository.Org, instance.Spec.Repository.Name, collaborator.Name)
+		if _, ok := err.(*gh.NotFoundError); ok {
+			r.ghClient.AddCollaborator(instance.Spec.Repository.Org, instance.Spec.Repository.Name, collaborator.Name, collaborator.Permission)
+		}
 	}
 
 	return reconcile.Result{}, nil
