@@ -51,6 +51,7 @@ func newGitHubClientMock(controller *gomock.Controller) gh.GitHubClientInterface
 	repoSpec := &github.Repository{Name: &repoName}
 	repoResp := &github.Repository{ID: &repoID, Name: &repoName}
 	c.EXPECT().CreateRepository(org, repoSpec).Return(repoResp, nil).Times(1)
+	c.EXPECT().DeleteRepository(org, repoName).Return(nil).Times(1)
 
 	firstGetRepo := c.EXPECT().GetRepository(org, repoName).Return(nil, &gh.NotFoundError{}).Times(1)
 	c.EXPECT().GetRepository(org, repoName).Return(repoResp, nil).After(firstGetRepo).Times(1)
@@ -168,14 +169,14 @@ func TestReconcile(t *testing.T) {
 
 	repo := &showksv1beta1.GitHub{}
 	// Delete the Deployment and expect Reconcile to be called for Deployment deletion
-	//g.Expect(c.Delete(context.TODO(), deploy)).NotTo(gomega.HaveOccurred())
-	//g.Eventually(requests, timeout).Should(gomega.Receive(gomega.Equal(expectedRequest)))
 	g.Eventually(func() error { return c.Get(context.TODO(), repoKey, repo) }, timeout).
 		Should(gomega.Succeed())
-
 	g.Expect(repo.Status.ID).To(gomega.Equal(repoID))
+
+	g.Expect(c.Delete(context.TODO(), repo)).NotTo(gomega.HaveOccurred())
+	g.Eventually(requests, timeout).Should(gomega.Receive(gomega.Equal(expectedRequest)))
 	// Manually delete Deployment since GC isn't enabled in the test control plane
-	//g.Eventually(func() error { return c.Delete(context.TODO(), deploy) }, timeout).
-	//	Should(gomega.MatchError("deployments.apps \"foo-deployment\" not found"))
+	g.Eventually(func() error { return c.Delete(context.TODO(), repo) }, timeout).
+		Should(gomega.MatchError("githubs.showks.cloudnativedays.jp \"foo\" not found"))
 
 }

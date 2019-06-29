@@ -35,6 +35,7 @@ import (
 )
 
 var log = logf.Log.WithName("controller")
+var finalizerName = "finalizer.github.showks.cloudnativedays.jp"
 
 /**
 * USER ACTION REQUIRED: This is a scaffold file intended for the user to modify with their own Controller
@@ -110,6 +111,14 @@ func (r *ReconcileGitHub) Reconcile(request reconcile.Request) (reconcile.Result
 		return reconcile.Result{}, err
 	}
 
+	if instance.ObjectMeta.DeletionTimestamp.IsZero() {
+		if err := r.setFinalizer(instance); err != nil {
+			return reconcile.Result{}, err
+		}
+	} else {
+		return r.runFinalizer(instance)
+	}
+
 	_, err = r.ghClient.GetRepository(instance.Spec.Repository.Org, instance.Spec.Repository.Name)
 	if err != nil {
 		if _, ok := err.(*gh.NotFoundError); ok {
@@ -145,6 +154,39 @@ func (r *ReconcileGitHub) Reconcile(request reconcile.Request) (reconcile.Result
 	}
 
 	return reconcile.Result{}, nil
+}
+
+func (r *ReconcileGitHub) setFinalizer(instance *showksv1beta1.GitHub) error {
+	fmt.Println("setFinalizer")
+	if !containsString(instance.ObjectMeta.Finalizers, finalizerName) {
+		instance.ObjectMeta.Finalizers = append(instance.ObjectMeta.Finalizers, finalizerName)
+		if err := r.Update(context.Background(), instance); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (r *ReconcileGitHub) runFinalizer(instannce *showksv1beta1.GitHub) (reconcile.Result, error) {
+	fmt.Println("runFinalizer")
+	if containsString(instannce.ObjectMeta.Finalizers, finalizerName) {
+		if err := r.deleteExternalDependency(instannce); err != nil {
+			return reconcile.Result{}, err
+		}
+
+		instannce.ObjectMeta.Finalizers = removeString(instannce.ObjectMeta.Finalizers, finalizerName)
+		if err := r.Update(context.Background(), instannce); err != nil {
+			return reconcile.Result{}, err
+		}
+	}
+
+	return reconcile.Result{}, nil
+}
+
+func (r *ReconcileGitHub) deleteExternalDependency(instance *showksv1beta1.GitHub) error {
+	fmt.Println("deleteExternalDependency")
+	return r.ghClient.DeleteRepository(instance.Spec.Repository.Org, instance.Spec.Repository.Name)
 }
 
 func (r *ReconcileGitHub) ReconcileCollaborators(instance *showksv1beta1.GitHub) error {
@@ -209,4 +251,23 @@ func (r *ReconcileGitHub) ReconcileWebHook(instance *showksv1beta1.GitHub) error
 	}
 
 	return nil
+}
+
+func containsString(slice []string, s string) bool {
+	for _, item := range slice {
+		if item == s {
+			return true
+		}
+	}
+	return false
+}
+
+func removeString(slice []string, s string) (result []string) {
+	for _, item := range slice {
+		if item == s {
+			continue
+		}
+		result = append(result, item)
+	}
+	return
 }

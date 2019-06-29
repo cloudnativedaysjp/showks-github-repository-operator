@@ -7,6 +7,7 @@ import (
 
 type GitHubClientInterface interface {
 	CreateRepository(org string, repo *github.Repository) (*github.Repository, error)
+	DeleteRepository(org string, repo string) error
 	GetRepository(org string, repo string) (*github.Repository, error)
 	AddCollaborator(owner string, repo string, user string, permission string) error
 	GetPermissionLevel(owner string, repo string, user string) (string, error)
@@ -28,6 +29,16 @@ func (c *GithubClient) CreateRepository(org string, repo *github.Repository) (*g
 	repo, _, err := c.client.Repositories.Create(ctx, org, repo)
 
 	return repo, err
+}
+
+func (c *GithubClient) DeleteRepository(org string, repo string) error {
+	ctx := context.Background()
+	_, err := c.client.Repositories.Delete(ctx, org, repo)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (c *GithubClient) GetRepository(org string, repoName string) (*github.Repository, error) {
