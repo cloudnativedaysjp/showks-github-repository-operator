@@ -63,16 +63,16 @@ func (mr *MockGitHubClientInterfaceMockRecorder) GetRepository(org, repo interfa
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRepository", reflect.TypeOf((*MockGitHubClientInterface)(nil).GetRepository), org, repo)
 }
 
-// AddCoraborator mocks base method
-func (m *MockGitHubClientInterface) AddCoraborator(owner, repo, user, permission string) error {
+// AddCollaborator mocks base method
+func (m *MockGitHubClientInterface) AddCollaborator(owner, repo, user, permission string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddCoraborator", owner, repo, user, permission)
+	ret := m.ctrl.Call(m, "AddCollaborator", owner, repo, user, permission)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// AddCoraborator indicates an expected call of AddCoraborator
-func (mr *MockGitHubClientInterfaceMockRecorder) AddCoraborator(owner, repo, user, permission interface{}) *gomock.Call {
+// AddCollaborator indicates an expected call of AddCollaborator
+func (mr *MockGitHubClientInterfaceMockRecorder) AddCollaborator(owner, repo, user, permission interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddCoraborator", reflect.TypeOf((*MockGitHubClientInterface)(nil).AddCoraborator), owner, repo, user, permission)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddCollaborator", reflect.TypeOf((*MockGitHubClientInterface)(nil).AddCollaborator), owner, repo, user, permission)
 }
