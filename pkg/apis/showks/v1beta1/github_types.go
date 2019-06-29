@@ -66,7 +66,6 @@ type RestrictionsSpec struct {
 }
 
 type WebhookSpec struct {
-	Name   string            `json:"name"`
 	Config WebhookConfigSpec `json:"config,omitempty"`
 	Events []string          `json:"events,omitempty"`
 	Avtibe bool              `json:"active,omitempty"`

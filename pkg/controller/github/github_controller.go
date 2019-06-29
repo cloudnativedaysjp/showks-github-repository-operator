@@ -139,6 +139,11 @@ func (r *ReconcileGitHub) Reconcile(request reconcile.Request) (reconcile.Result
 		return reconcile.Result{}, err
 	}
 
+	err = r.ReconcileWebHook(instance)
+	if err != nil {
+		return reconcile.Result{}, err
+	}
+
 	return reconcile.Result{}, nil
 }
 
@@ -175,6 +180,29 @@ func (r *ReconcileGitHub) ReconcileBranchProtection(instance *showksv1beta1.GitH
 		}
 
 		_, err := r.ghClient.UpdateBranchProtection(owner, repo, bpSpec.BranchName, bp)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (r *ReconcileGitHub) ReconcileWebHook(instance *showksv1beta1.GitHub) error {
+	owner := instance.Spec.Repository.Org
+	repo := instance.Spec.Repository.Name
+	for _, whSpec := range instance.Spec.Webhooks {
+		wh := &github.Hook{
+			Config: map[string]interface{}{
+				"url":          whSpec.Config.Url,
+				"content_type": whSpec.Config.ContentType,
+			},
+			Events: whSpec.Events,
+			Active: &whSpec.Avtibe,
+		}
+		fmt.Printf("config: %+v\n", whSpec.Config)
+
+		_, err := r.ghClient.CreateHook(owner, repo, wh)
 		if err != nil {
 			return err
 		}
