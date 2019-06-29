@@ -48,6 +48,20 @@ func (mr *MockGitHubClientInterfaceMockRecorder) CreateRepository(org, repo inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRepository", reflect.TypeOf((*MockGitHubClientInterface)(nil).CreateRepository), org, repo)
 }
 
+// DeleteRepository mocks base method
+func (m *MockGitHubClientInterface) DeleteRepository(org, repo string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteRepository", org, repo)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteRepository indicates an expected call of DeleteRepository
+func (mr *MockGitHubClientInterfaceMockRecorder) DeleteRepository(org, repo interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRepository", reflect.TypeOf((*MockGitHubClientInterface)(nil).DeleteRepository), org, repo)
+}
+
 // GetRepository mocks base method
 func (m *MockGitHubClientInterface) GetRepository(org, repo string) (*github.Repository, error) {
 	m.ctrl.T.Helper()
