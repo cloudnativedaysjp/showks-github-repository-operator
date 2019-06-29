@@ -106,3 +106,18 @@ func (mr *MockGitHubClientInterfaceMockRecorder) UpdateBranchProtection(owner, r
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateBranchProtection", reflect.TypeOf((*MockGitHubClientInterface)(nil).UpdateBranchProtection), owner, repo, branch, request)
 }
+
+// CreateHook mocks base method
+func (m *MockGitHubClientInterface) CreateHook(owner, repo string, hook *github.Hook) (*github.Hook, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateHook", owner, repo, hook)
+	ret0, _ := ret[0].(*github.Hook)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateHook indicates an expected call of CreateHook
+func (mr *MockGitHubClientInterfaceMockRecorder) CreateHook(owner, repo, hook interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateHook", reflect.TypeOf((*MockGitHubClientInterface)(nil).CreateHook), owner, repo, hook)
+}

@@ -72,6 +72,17 @@ func newGitHubClientMock(controller *gomock.Controller) gh.GitHubClientInterface
 	}
 	protection := &github.Protection{Restrictions: &github.BranchRestrictions{Teams: []*github.Team{{Name: &team}}}}
 	c.EXPECT().UpdateBranchProtection(org, repoName, "master", protectionReq).Return(protection, nil).Times(2)
+
+	active := true
+	hook := &github.Hook{
+		Config: map[string]interface{}{
+			"url":          "https://example.com",
+			"content_type": "json",
+		},
+		Events: []string{"push"},
+		Active: &active,
+	}
+	c.EXPECT().CreateHook(org, repoName, hook).Return(hook, nil).Times(2)
 	return c
 }
 
@@ -104,6 +115,16 @@ func TestReconcile(t *testing.T) {
 					Restrictions: showksv1beta1.RestrictionsSpec{
 						Teams: []string{"showks-members"},
 					},
+				},
+			},
+			Webhooks: []showksv1beta1.WebhookSpec{
+				{
+					Active: true,
+					Config: showksv1beta1.WebhookConfigSpec{
+						Url:         "https://example.com",
+						ContentType: "json",
+					},
+					Events: []string{"push"},
 				},
 			},
 		},

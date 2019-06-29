@@ -11,6 +11,7 @@ type GitHubClientInterface interface {
 	AddCollaborator(owner string, repo string, user string, permission string) error
 	GetPermissionLevel(owner string, repo string, user string) (string, error)
 	UpdateBranchProtection(owner string, repo string, branch string, request *github.ProtectionRequest) (*github.Protection, error)
+	CreateHook(owner string, repo string, hook *github.Hook) (*github.Hook, error)
 }
 
 func NewClient() GitHubClientInterface {
@@ -67,6 +68,16 @@ func (c *GithubClient) UpdateBranchProtection(owner string, repo string, branch 
 	}
 
 	return p, nil
+}
+
+func (c *GithubClient) CreateHook(owner string, repo string, hook *github.Hook) (*github.Hook, error) {
+	ctx := context.Background()
+	h, _, err := c.client.Repositories.CreateHook(ctx, owner, repo, hook)
+	if err != nil {
+		return h, err
+	}
+
+	return h, nil
 }
 
 type NotFoundError struct {
