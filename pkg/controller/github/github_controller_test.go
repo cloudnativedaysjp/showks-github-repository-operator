@@ -55,6 +55,10 @@ func newGitHubClientMock(controller *gomock.Controller) gh.GitHubClientInterface
 	firstGetRepo := c.EXPECT().GetRepository(org, repoName).Return(nil, &gh.NotFoundError{}).Times(1)
 	c.EXPECT().GetRepository(org, repoName).Return(repoResp, nil).After(firstGetRepo).Times(1)
 
+	c.EXPECT().AddCollaborator(org, repoName, "alice", "admin").Return(nil).Times(1)
+	firstGetPermission := c.EXPECT().GetPermissionLevel(org, repoName, "alice").Return("", &gh.NotFoundError{}).Times(1)
+	c.EXPECT().GetPermissionLevel(org, repoName, "alice").Return("admin", nil).After(firstGetPermission).Times(1)
+
 	return c
 }
 
@@ -69,6 +73,12 @@ func TestReconcile(t *testing.T) {
 			Repository: showksv1beta1.RepositorySpec{
 				Org:  org,
 				Name: repoName,
+				Collaborators: []showksv1beta1.CollaboratorSpec{
+					{
+						Name:       "alice",
+						Permission: "admin",
+					},
+				},
 			},
 		},
 	}

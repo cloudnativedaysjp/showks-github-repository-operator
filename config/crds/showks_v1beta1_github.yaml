@@ -65,7 +65,15 @@ spec:
               properties:
                 collaborators:
                   items:
-                    type: string
+                    properties:
+                      name:
+                        type: string
+                      permission:
+                        type: string
+                    required:
+                    - name
+                    - permission
+                    type: object
                   type: array
                 name:
                   type: string

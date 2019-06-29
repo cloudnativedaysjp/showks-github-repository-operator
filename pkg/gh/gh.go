@@ -8,6 +8,8 @@ import (
 type GitHubClientInterface interface {
 	CreateRepository(org string, repo *github.Repository) (*github.Repository, error)
 	GetRepository(org string, repo string) (*github.Repository, error)
+	AddCollaborator(owner string, repo string, user string, permission string) error
+	GetPermissionLevel(owner string, repo string, user string) (string, error)
 }
 
 func NewClient() GitHubClientInterface {
@@ -31,12 +33,35 @@ func (c *GithubClient) GetRepository(org string, repoName string) (*github.Repos
 	repo, resp, err := c.client.Repositories.Get(ctx, org, repoName)
 
 	if resp.Response.StatusCode == 404 {
-		return nil, NotFoundError{}
+		return nil, &NotFoundError{}
 	}
 
 	return repo, err
 }
 
+func (c *GithubClient) AddCollaborator(owner string, repo string, user string, permission string) error {
+	opt := &github.RepositoryAddCollaboratorOptions{Permission: permission}
+	ctx := context.Background()
+	_, err := c.client.Repositories.AddCollaborator(ctx, owner, repo, user, opt)
+	return err
+}
+
+func (c *GithubClient) GetPermissionLevel(owner string, repo string, user string) (string, error) {
+	ctx := context.Background()
+	pl, resp, err := c.client.Repositories.GetPermissionLevel(ctx, owner, repo, user)
+	if err != nil {
+		return "", err
+	}
+	if resp.Response.StatusCode == 404 {
+		return "", &NotFoundError{}
+	}
+	return *pl.Permission, nil
+}
+
 type NotFoundError struct {
 	error
+}
+
+func (e *NotFoundError) Error() string {
+	return e.error.Error()
 }

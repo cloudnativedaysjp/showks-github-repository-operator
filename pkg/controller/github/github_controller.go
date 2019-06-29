@@ -129,5 +129,27 @@ func (r *ReconcileGitHub) Reconcile(request reconcile.Request) (reconcile.Result
 		}
 	}
 
+	err = r.ReconcileCollaborators(instance)
+	if err != nil {
+		return reconcile.Result{}, err
+	}
+
 	return reconcile.Result{}, nil
+}
+
+func (r *ReconcileGitHub) ReconcileCollaborators(instance *showksv1beta1.GitHub) error {
+	for _, collaborator := range instance.Spec.Repository.Collaborators {
+		_, err := r.ghClient.GetPermissionLevel(instance.Spec.Repository.Org, instance.Spec.Repository.Name, collaborator.Name)
+		if _, ok := err.(*gh.NotFoundError); ok {
+			err = r.ghClient.AddCollaborator(instance.Spec.Repository.Org, instance.Spec.Repository.Name, collaborator.Name, collaborator.Permission)
+			if err != nil {
+				return err
+			}
+		} else {
+			return err
+
+		}
+	}
+
+	return nil
 }

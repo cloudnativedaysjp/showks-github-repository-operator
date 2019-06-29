@@ -33,10 +33,15 @@ type GitHubSpec struct {
 }
 
 type RepositorySpec struct {
-	Org           string   `json:"org"`
-	Name          string   `json:"name"`
-	TeamID        string   `json:"teamID,omitempty"`
-	Collaborators []string `json:"collaborators,omitempty"`
+	Org           string             `json:"org"`
+	Name          string             `json:"name"`
+	TeamID        string             `json:"teamID,omitempty"`
+	Collaborators []CollaboratorSpec `json:"collaborators,omitempty"`
+}
+
+type CollaboratorSpec struct {
+	Name       string `json:"name"`
+	Permission string `json:"permission"`
 }
 
 type BranchProtectionSpec struct {
