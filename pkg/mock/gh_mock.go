@@ -121,6 +121,21 @@ func (mr *MockGitHubClientInterfaceMockRecorder) UpdateBranchProtection(owner, r
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateBranchProtection", reflect.TypeOf((*MockGitHubClientInterface)(nil).UpdateBranchProtection), owner, repo, branch, request)
 }
 
+// ListHook mocks base method
+func (m *MockGitHubClientInterface) ListHook(owner, repo string) ([]*github.Hook, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListHook", owner, repo)
+	ret0, _ := ret[0].([]*github.Hook)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListHook indicates an expected call of ListHook
+func (mr *MockGitHubClientInterfaceMockRecorder) ListHook(owner, repo interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListHook", reflect.TypeOf((*MockGitHubClientInterface)(nil).ListHook), owner, repo)
+}
+
 // CreateHook mocks base method
 func (m *MockGitHubClientInterface) CreateHook(owner, repo string, hook *github.Hook) (*github.Hook, error) {
 	m.ctrl.T.Helper()
@@ -134,4 +149,33 @@ func (m *MockGitHubClientInterface) CreateHook(owner, repo string, hook *github.
 func (mr *MockGitHubClientInterfaceMockRecorder) CreateHook(owner, repo, hook interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateHook", reflect.TypeOf((*MockGitHubClientInterface)(nil).CreateHook), owner, repo, hook)
+}
+
+// UpdateHook mocks base method
+func (m *MockGitHubClientInterface) UpdateHook(owner, repo string, id int64, hook *github.Hook) (*github.Hook, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateHook", owner, repo, id, hook)
+	ret0, _ := ret[0].(*github.Hook)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateHook indicates an expected call of UpdateHook
+func (mr *MockGitHubClientInterfaceMockRecorder) UpdateHook(owner, repo, id, hook interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateHook", reflect.TypeOf((*MockGitHubClientInterface)(nil).UpdateHook), owner, repo, id, hook)
+}
+
+// DeleteHook mocks base method
+func (m *MockGitHubClientInterface) DeleteHook(owner, repo string, id int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteHook", owner, repo, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteHook indicates an expected call of DeleteHook
+func (mr *MockGitHubClientInterfaceMockRecorder) DeleteHook(owner, repo, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteHook", reflect.TypeOf((*MockGitHubClientInterface)(nil).DeleteHook), owner, repo, id)
 }
