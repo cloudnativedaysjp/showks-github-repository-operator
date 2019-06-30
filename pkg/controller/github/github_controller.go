@@ -207,6 +207,7 @@ func (r *ReconcileGitHub) ReconcileCollaborators(instance *showksv1beta1.GitHub)
 }
 
 func (r *ReconcileGitHub) ReconcileBranchProtection(instance *showksv1beta1.GitHub) error {
+	log.Info("Reconcile: BranchProtection")
 	owner := instance.Spec.Repository.Org
 	repo := instance.Spec.Repository.Name
 	for _, bpSpec := range instance.Spec.BranchProtections {
@@ -217,14 +218,17 @@ func (r *ReconcileGitHub) ReconcileBranchProtection(instance *showksv1beta1.GitH
 			},
 			EnforceAdmins: bpSpec.EnforceAdmin,
 			Restrictions: &github.BranchRestrictionsRequest{
+				Users: bpSpec.Restrictions.Users,
 				Teams: bpSpec.Restrictions.Teams,
 			},
 		}
 
+		log.Info("Updating BranchProtection...", "branch", bpSpec.BranchName)
 		_, err := r.ghClient.UpdateBranchProtection(owner, repo, bpSpec.BranchName, bp)
 		if err != nil {
 			return err
 		}
+		log.Info("Updated BranchProtection.", "branch", bpSpec.BranchName)
 	}
 
 	return nil
