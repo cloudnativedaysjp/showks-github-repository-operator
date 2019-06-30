@@ -4,12 +4,12 @@ metadata:
   creationTimestamp: null
   labels:
     controller-tools.k8s.io: "1.0"
-  name: githubs.showks.cloudnativedays.jp
+  name: githubrepositories.showks.cloudnativedays.jp
 spec:
   group: showks.cloudnativedays.jp
   names:
-    kind: GitHub
-    plural: githubs
+    kind: GitHubRepository
+    plural: githubrepositories
   scope: Namespaced
   subresources:
     status: {}

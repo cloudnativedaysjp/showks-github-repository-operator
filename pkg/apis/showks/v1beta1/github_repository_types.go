@@ -23,7 +23,7 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// GitHubRepositorySpec defines the desired state of GitHub
+// GitHubRepositorySpec defines the desired state of GitHubRepository
 type GitHubRepositorySpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
@@ -71,8 +71,8 @@ type WebhookConfigSpec struct {
 	ContentType string `json:"contentType"`
 }
 
-// GitHubStatus defines the observed state of GitHub
-type GitHubStatus struct {
+// GitHubRepositoryStatus defines the observed state of GitHubRepository
+type GitHubRepositoryStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 	ID int64
@@ -81,26 +81,26 @@ type GitHubStatus struct {
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// GitHub is the Schema for the githubs API
+// GitHubRepository is the Schema for the githubs API
 // +k8s:openapi-gen=true
 // +kubebuilder:subresource:status
-type GitHub struct {
+type GitHubRepository struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   GitHubRepositorySpec `json:"spec,omitempty"`
-	Status GitHubStatus         `json:"status,omitempty"`
+	Spec   GitHubRepositorySpec   `json:"spec,omitempty"`
+	Status GitHubRepositoryStatus `json:"status,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// GitHubList contains a list of GitHub
-type GitHubList struct {
+// GitHubRepositoryList contains a list of GitHubRepository
+type GitHubRepositoryList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []GitHub `json:"items"`
+	Items           []GitHubRepository `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&GitHub{}, &GitHubList{})
+	SchemeBuilder.Register(&GitHubRepository{}, &GitHubRepositoryList{})
 }
