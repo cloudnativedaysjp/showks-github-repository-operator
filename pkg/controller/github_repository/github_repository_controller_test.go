@@ -110,15 +110,13 @@ func TestReconcile(t *testing.T) {
 			Name:      "foo",
 			Namespace: "default",
 		},
-		Spec: showksv1beta1.GitHubSpec{
-			Repository: showksv1beta1.RepositorySpec{
-				Org:  org,
-				Name: repoName,
-				Collaborators: []showksv1beta1.CollaboratorSpec{
-					{
-						Name:       "alice",
-						Permission: "admin",
-					},
+		Spec: showksv1beta1.GitHubRepositorySpec{
+			Org:  org,
+			Name: repoName,
+			Collaborators: []showksv1beta1.CollaboratorSpec{
+				{
+					Name:       "alice",
+					Permission: "admin",
 				},
 			},
 			BranchProtections: []showksv1beta1.BranchProtectionSpec{

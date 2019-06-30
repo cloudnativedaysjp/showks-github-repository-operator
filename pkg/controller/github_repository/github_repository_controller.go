@@ -119,11 +119,11 @@ func (r *ReconcileGitHub) Reconcile(request reconcile.Request) (reconcile.Result
 		return r.runFinalizer(instance)
 	}
 
-	_, err = r.ghClient.GetRepository(instance.Spec.Repository.Org, instance.Spec.Repository.Name)
+	_, err = r.ghClient.GetRepository(instance.Spec.Org, instance.Spec.Name)
 	if err != nil {
 		if _, ok := err.(*gh.NotFoundError); ok {
-			repoSpec := &github.Repository{Name: &instance.Spec.Repository.Name}
-			repo, err := r.ghClient.CreateRepository(instance.Spec.Repository.Org, repoSpec)
+			repoSpec := &github.Repository{Name: &instance.Spec.Name}
+			repo, err := r.ghClient.CreateRepository(instance.Spec.Org, repoSpec)
 			if err != nil {
 				return reconcile.Result{}, err
 			}
@@ -186,14 +186,14 @@ func (r *ReconcileGitHub) runFinalizer(instannce *showksv1beta1.GitHub) (reconci
 
 func (r *ReconcileGitHub) deleteExternalDependency(instance *showksv1beta1.GitHub) error {
 	fmt.Println("deleteExternalDependency")
-	return r.ghClient.DeleteRepository(instance.Spec.Repository.Org, instance.Spec.Repository.Name)
+	return r.ghClient.DeleteRepository(instance.Spec.Org, instance.Spec.Name)
 }
 
 func (r *ReconcileGitHub) ReconcileCollaborators(instance *showksv1beta1.GitHub) error {
-	for _, collaborator := range instance.Spec.Repository.Collaborators {
-		_, err := r.ghClient.GetPermissionLevel(instance.Spec.Repository.Org, instance.Spec.Repository.Name, collaborator.Name)
+	for _, collaborator := range instance.Spec.Collaborators {
+		_, err := r.ghClient.GetPermissionLevel(instance.Spec.Org, instance.Spec.Name, collaborator.Name)
 		if _, ok := err.(*gh.NotFoundError); ok {
-			err = r.ghClient.AddCollaborator(instance.Spec.Repository.Org, instance.Spec.Repository.Name, collaborator.Name, collaborator.Permission)
+			err = r.ghClient.AddCollaborator(instance.Spec.Org, instance.Spec.Name, collaborator.Name, collaborator.Permission)
 			if err != nil {
 				return err
 			}
@@ -208,8 +208,8 @@ func (r *ReconcileGitHub) ReconcileCollaborators(instance *showksv1beta1.GitHub)
 
 func (r *ReconcileGitHub) ReconcileBranchProtection(instance *showksv1beta1.GitHub) error {
 	log.Info("Reconcile: BranchProtection")
-	owner := instance.Spec.Repository.Org
-	repo := instance.Spec.Repository.Name
+	owner := instance.Spec.Org
+	repo := instance.Spec.Name
 	for _, bpSpec := range instance.Spec.BranchProtections {
 		bp := &github.ProtectionRequest{
 			RequiredStatusChecks: &github.RequiredStatusChecks{
@@ -238,8 +238,8 @@ func (r *ReconcileGitHub) ReconcileBranchProtection(instance *showksv1beta1.GitH
 // リポジトリにあってSpecにないWebHookは削除する
 func (r *ReconcileGitHub) ReconcileWebHook(instance *showksv1beta1.GitHub) error {
 	log.Info("Reconcile: WebHook")
-	owner := instance.Spec.Repository.Org
-	repo := instance.Spec.Repository.Name
+	owner := instance.Spec.Org
+	repo := instance.Spec.Name
 
 	existsHooks, err := r.ghClient.ListHook(owner, repo)
 	if err != nil {

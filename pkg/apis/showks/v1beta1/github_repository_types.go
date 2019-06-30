@@ -23,20 +23,15 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// GitHubSpec defines the desired state of GitHub
-type GitHubSpec struct {
+// GitHubRepositorySpec defines the desired state of GitHub
+type GitHubRepositorySpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-	Repository        RepositorySpec         `json:"repository"`
+	Org               string                 `json:"org"`
+	Name              string                 `json:"name"`
 	BranchProtections []BranchProtectionSpec `json:"branchProtections,omitempty"`
 	Webhooks          []WebhookSpec          `json:"webhooks,omitempty"`
-}
-
-type RepositorySpec struct {
-	Org           string             `json:"org"`
-	Name          string             `json:"name"`
-	TeamID        string             `json:"teamID,omitempty"`
-	Collaborators []CollaboratorSpec `json:"collaborators,omitempty"`
+	Collaborators     []CollaboratorSpec     `json:"collaborators,omitempty"`
 }
 
 type CollaboratorSpec struct {
@@ -93,8 +88,8 @@ type GitHub struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   GitHubSpec   `json:"spec,omitempty"`
-	Status GitHubStatus `json:"status,omitempty"`
+	Spec   GitHubRepositorySpec `json:"spec,omitempty"`
+	Status GitHubStatus         `json:"status,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
