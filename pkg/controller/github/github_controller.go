@@ -230,23 +230,116 @@ func (r *ReconcileGitHub) ReconcileBranchProtection(instance *showksv1beta1.GitH
 	return nil
 }
 
+// リポジトリに同じURLのWebHookがなければ作成、あれば更新する
+// リポジトリにあってSpecにないWebHookは削除する
 func (r *ReconcileGitHub) ReconcileWebHook(instance *showksv1beta1.GitHub) error {
+	log.Info("Reconcile: WebHook")
 	owner := instance.Spec.Repository.Org
 	repo := instance.Spec.Repository.Name
-	for _, whSpec := range instance.Spec.Webhooks {
-		wh := &github.Hook{
-			Config: map[string]interface{}{
-				"url":          whSpec.Config.Url,
-				"content_type": whSpec.Config.ContentType,
-			},
-			Events: whSpec.Events,
-			Active: &whSpec.Active,
-		}
-		fmt.Printf("config: %+v\n", whSpec.Config)
 
-		_, err := r.ghClient.CreateHook(owner, repo, wh)
-		if err != nil {
-			return err
+	existsHooks, err := r.ghClient.ListHook(owner, repo)
+	if err != nil {
+		return err
+	}
+
+	for _, whSpec := range instance.Spec.Webhooks {
+		existsHook := findHookByUrl(existsHooks, whSpec.Config.Url)
+
+		if existsHook != nil {
+			log.Info("WebHook already exists on this repository", "url", whSpec.Config.Url)
+			err := r.updateWebHook(owner, repo, *existsHook.ID, whSpec)
+			if err != nil {
+				return err
+			}
+		} else {
+			log.Info("WebHook does'nt exists on this repository", "url", whSpec.Config.Url)
+			err := r.createWebHook(owner, repo, whSpec)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	for _, existsHook := range existsHooks {
+		exist := false
+		for _, whSpec := range instance.Spec.Webhooks {
+			if whSpec.Config.Url == existsHook.Config["url"].(string) {
+				exist = true
+			}
+		}
+
+		if !exist {
+			err := r.deleteWebHook(owner, repo, *existsHook.ID, existsHook)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (r *ReconcileGitHub) createWebHook(owner string, repo string, hook showksv1beta1.WebhookSpec) error {
+	log.Info("Creating WebHook...", "url", hook.Config.Url)
+
+	wh := &github.Hook{
+		Config: map[string]interface{}{
+			"url":          hook.Config.Url,
+			"content_type": hook.Config.ContentType,
+		},
+		Events: hook.Events,
+		Active: &hook.Active,
+	}
+
+	_, err := r.ghClient.CreateHook(owner, repo, wh)
+	if err != nil {
+		return err
+	}
+
+	log.Info("Created WebHook.", "url", hook.Config.Url)
+
+	return nil
+}
+
+func (r *ReconcileGitHub) updateWebHook(owner string, repo string, id int64, hook showksv1beta1.WebhookSpec) error {
+	log.Info("Updating WebHook...", "url", hook.Config.Url)
+
+	wh := &github.Hook{
+		Config: map[string]interface{}{
+			"url":          hook.Config.Url,
+			"content_type": hook.Config.ContentType,
+		},
+		Events: hook.Events,
+		Active: &hook.Active,
+	}
+
+	_, err := r.ghClient.UpdateHook(owner, repo, id, wh)
+	if err != nil {
+		return err
+	}
+
+	log.Info("Updated WebHook.", "url", hook.Config.Url)
+
+	return nil
+}
+
+func (r *ReconcileGitHub) deleteWebHook(owner string, repo string, id int64, hook *github.Hook) error {
+	log.Info("Deleting WebHook...", "url", hook.Config["url"].(string))
+
+	err := r.ghClient.DeleteHook(owner, repo, *hook.ID)
+	if err != nil {
+		return err
+	}
+
+	log.Info("Deleted WebHook...", "url", hook.Config["url"].(string))
+
+	return nil
+}
+
+func findHookByUrl(hooks []*github.Hook, url string) *github.Hook {
+	for _, hook := range hooks {
+		if url == hook.Config["url"].(string) {
+			return hook
 		}
 	}
 

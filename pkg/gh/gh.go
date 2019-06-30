@@ -14,7 +14,10 @@ type GitHubClientInterface interface {
 	AddCollaborator(owner string, repo string, user string, permission string) error
 	GetPermissionLevel(owner string, repo string, user string) (string, error)
 	UpdateBranchProtection(owner string, repo string, branch string, request *github.ProtectionRequest) (*github.Protection, error)
+	ListHook(owner string, repo string) ([]*github.Hook, error)
 	CreateHook(owner string, repo string, hook *github.Hook) (*github.Hook, error)
+	UpdateHook(owner string, repo string, id int64, hook *github.Hook) (*github.Hook, error)
+	DeleteHook(owner string, repo string, id int64) error
 }
 
 func NewClient() GitHubClientInterface {
@@ -89,6 +92,26 @@ func (c *GithubClient) UpdateBranchProtection(owner string, repo string, branch 
 	return p, nil
 }
 
+func (c *GithubClient) ListHook(owner string, repo string) ([]*github.Hook, error) {
+	ctx := context.Background()
+	hooks, _, err := c.client.Repositories.ListHooks(ctx, owner, repo, &github.ListOptions{})
+	if err != nil {
+		return hooks, err
+	}
+
+	return hooks, nil
+}
+
+func (c *GithubClient) UpdateHook(owner string, repo string, id int64, hook *github.Hook) (*github.Hook, error) {
+	ctx := context.Background()
+	hook, _, err := c.client.Repositories.EditHook(ctx, owner, repo, id, hook)
+	if err != nil {
+		return hook, err
+	}
+
+	return hook, nil
+}
+
 func (c *GithubClient) CreateHook(owner string, repo string, hook *github.Hook) (*github.Hook, error) {
 	ctx := context.Background()
 	h, _, err := c.client.Repositories.CreateHook(ctx, owner, repo, hook)
@@ -97,6 +120,16 @@ func (c *GithubClient) CreateHook(owner string, repo string, hook *github.Hook) 
 	}
 
 	return h, nil
+}
+
+func (c *GithubClient) DeleteHook(owner string, repo string, id int64) error {
+	ctx := context.Background()
+	_, err := c.client.Repositories.DeleteHook(ctx, owner, repo, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 type NotFoundError struct {
