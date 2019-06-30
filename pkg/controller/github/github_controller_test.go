@@ -75,6 +75,7 @@ func newGitHubClientMock(controller *gomock.Controller) gh.GitHubClientInterface
 	c.EXPECT().UpdateBranchProtection(org, repoName, "master", protectionReq).Return(protection, nil).Times(2)
 
 	active := true
+	var hookID int64 = 12345
 	hook := &github.Hook{
 		Config: map[string]interface{}{
 			"url":          "https://example.com",
@@ -83,7 +84,22 @@ func newGitHubClientMock(controller *gomock.Controller) gh.GitHubClientInterface
 		Events: []string{"push"},
 		Active: &active,
 	}
-	c.EXPECT().CreateHook(org, repoName, hook).Return(hook, nil).Times(2)
+	c.EXPECT().CreateHook(org, repoName, hook).Return(hook, nil).Times(1)
+
+	firstListHook := c.EXPECT().ListHook(org, repoName).Return([]*github.Hook{}, nil).Times(1)
+	hooks := []*github.Hook{
+		{
+			Config: map[string]interface{}{
+				"url":          "https://example.com",
+				"content_type": "json",
+			},
+			Events: []string{"push"},
+			Active: &active,
+			ID:     &hookID,
+		},
+	}
+	c.EXPECT().ListHook(org, repoName).Return(hooks, nil).After(firstListHook).Times(1)
+	c.EXPECT().UpdateHook(org, repoName, hookID, hook).Return(hook, nil).Times(1)
 	return c
 }
 
