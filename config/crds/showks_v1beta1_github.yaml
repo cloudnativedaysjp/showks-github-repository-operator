@@ -30,7 +30,7 @@ spec:
           type: object
         spec:
           properties:
-            branchProtection:
+            branchProtections:
               items:
                 properties:
                   branchName:
@@ -59,8 +59,6 @@ spec:
                           type: string
                         type: array
                     type: object
-                required:
-                - requiredStatusChecks
                 type: object
               type: array
             repository:
