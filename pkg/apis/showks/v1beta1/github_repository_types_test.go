@@ -30,7 +30,7 @@ func TestStorageGitHub(t *testing.T) {
 		Name:      "foo",
 		Namespace: "default",
 	}
-	created := &GitHub{
+	created := &GitHubRepository{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "foo",
 			Namespace: "default",
@@ -38,7 +38,7 @@ func TestStorageGitHub(t *testing.T) {
 	g := gomega.NewGomegaWithT(t)
 
 	// Test Create
-	fetched := &GitHub{}
+	fetched := &GitHubRepository{}
 	g.Expect(c.Create(context.TODO(), created)).NotTo(gomega.HaveOccurred())
 
 	g.Expect(c.Get(context.TODO(), key, fetched)).NotTo(gomega.HaveOccurred())

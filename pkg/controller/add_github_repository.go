@@ -17,10 +17,10 @@ limitations under the License.
 package controller
 
 import (
-	"github.com/cloudnativedaysjp/showks-github-repository-operator/pkg/controller/github"
+	"github.com/cloudnativedaysjp/showks-github-repository-operator/pkg/controller/github_repository"
 )
 
 func init() {
 	// AddToManagerFuncs is a list of functions to create controllers and add them to a manager.
-	AddToManagerFuncs = append(AddToManagerFuncs, github.Add)
+	AddToManagerFuncs = append(AddToManagerFuncs, github_repository.Add)
 }

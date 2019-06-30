@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package github
+package github_repository
 
 import (
 	"context"
@@ -105,20 +105,18 @@ func newGitHubClientMock(controller *gomock.Controller) gh.GitHubClientInterface
 
 func TestReconcile(t *testing.T) {
 	g := gomega.NewGomegaWithT(t)
-	instance := &showksv1beta1.GitHub{
+	instance := &showksv1beta1.GitHubRepository{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "foo",
 			Namespace: "default",
 		},
-		Spec: showksv1beta1.GitHubSpec{
-			Repository: showksv1beta1.RepositorySpec{
-				Org:  org,
-				Name: repoName,
-				Collaborators: []showksv1beta1.CollaboratorSpec{
-					{
-						Name:       "alice",
-						Permission: "admin",
-					},
+		Spec: showksv1beta1.GitHubRepositorySpec{
+			Org:  org,
+			Name: repoName,
+			Collaborators: []showksv1beta1.CollaboratorSpec{
+				{
+					Name:       "alice",
+					Permission: "admin",
 				},
 			},
 			BranchProtections: []showksv1beta1.BranchProtectionSpec{
@@ -167,7 +165,7 @@ func TestReconcile(t *testing.T) {
 		mgrStopped.Wait()
 	}()
 
-	// Create the GitHub object and expect the Reconcile and Deployment to be created
+	// Create the GitHubRepository object and expect the Reconcile and Deployment to be created
 	err = c.Create(context.TODO(), instance)
 	// The instance object may not be a valid object because it might be missing some required fields.
 	// Please modify the instance object by adding required fields and then remove the following if statement.
@@ -183,7 +181,7 @@ func TestReconcile(t *testing.T) {
 	//g.Eventually(func() error { return c.Get(context.TODO(), depKey, deploy) }, timeout).
 	//	Should(gomega.Succeed())
 
-	repo := &showksv1beta1.GitHub{}
+	repo := &showksv1beta1.GitHubRepository{}
 	// Delete the Deployment and expect Reconcile to be called for Deployment deletion
 	g.Eventually(func() error { return c.Get(context.TODO(), repoKey, repo) }, timeout).
 		Should(gomega.Succeed())
@@ -193,6 +191,6 @@ func TestReconcile(t *testing.T) {
 	g.Eventually(requests, timeout).Should(gomega.Receive(gomega.Equal(expectedRequest)))
 	// Manually delete Deployment since GC isn't enabled in the test control plane
 	g.Eventually(func() error { return c.Delete(context.TODO(), repo) }, timeout).
-		Should(gomega.MatchError("githubs.showks.cloudnativedays.jp \"foo\" not found"))
+		Should(gomega.MatchError("githubrepositories.showks.cloudnativedays.jp \"foo\" not found"))
 
 }

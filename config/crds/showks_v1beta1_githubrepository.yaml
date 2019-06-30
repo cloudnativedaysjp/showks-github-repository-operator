@@ -4,12 +4,12 @@ metadata:
   creationTimestamp: null
   labels:
     controller-tools.k8s.io: "1.0"
-  name: githubs.showks.cloudnativedays.jp
+  name: githubrepositories.showks.cloudnativedays.jp
 spec:
   group: showks.cloudnativedays.jp
   names:
-    kind: GitHub
-    plural: githubs
+    kind: GitHubRepository
+    plural: githubrepositories
   scope: Namespaced
   subresources:
     status: {}
@@ -61,32 +61,24 @@ spec:
                     type: object
                 type: object
               type: array
-            repository:
+            collaborators:
+              items:
+                properties:
+                  name:
+                    type: string
+                  permission:
+                    type: string
+                required:
+                - name
+                - permission
+                type: object
+              type: array
+            name:
+              type: string
+            org:
               description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
                 Important: Run "make" to regenerate code after modifying this file'
-              properties:
-                collaborators:
-                  items:
-                    properties:
-                      name:
-                        type: string
-                      permission:
-                        type: string
-                    required:
-                    - name
-                    - permission
-                    type: object
-                  type: array
-                name:
-                  type: string
-                org:
-                  type: string
-                teamID:
-                  type: string
-              required:
-              - org
-              - name
-              type: object
+              type: string
             webhooks:
               items:
                 properties:
@@ -109,7 +101,8 @@ spec:
                 type: object
               type: array
           required:
-          - repository
+          - org
+          - name
           type: object
         status:
           type: object

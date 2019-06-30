@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package github
+package github_repository
 
 import (
 	"context"
@@ -42,7 +42,7 @@ var finalizerName = "finalizer.github.showks.cloudnativedays.jp"
 * business logic.  Delete these comments after modifying this file.*
  */
 
-// Add creates a new GitHub Controller and adds it to the Manager with default RBAC. The Manager will set fields on the Controller
+// Add creates a new GitHubRepository Controller and adds it to the Manager with default RBAC. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
 func Add(mgr manager.Manager) error {
 	c := gh.NewClient()
@@ -62,17 +62,17 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 		return err
 	}
 
-	// Watch for changes to GitHub
-	err = c.Watch(&source.Kind{Type: &showksv1beta1.GitHub{}}, &handler.EnqueueRequestForObject{})
+	// Watch for changes to GitHubRepository
+	err = c.Watch(&source.Kind{Type: &showksv1beta1.GitHubRepository{}}, &handler.EnqueueRequestForObject{})
 	if err != nil {
 		return err
 	}
 
 	// TODO(user): Modify this to be the types you create
-	// Uncomment watch a Deployment created by GitHub - change this for objects you create
+	// Uncomment watch a Deployment created by GitHubRepository - change this for objects you create
 	err = c.Watch(&source.Kind{Type: &appsv1.Deployment{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
-		OwnerType:    &showksv1beta1.GitHub{},
+		OwnerType:    &showksv1beta1.GitHubRepository{},
 	})
 	if err != nil {
 		return err
@@ -83,15 +83,15 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 
 var _ reconcile.Reconciler = &ReconcileGitHub{}
 
-// ReconcileGitHub reconciles a GitHub object
+// ReconcileGitHub reconciles a GitHubRepository object
 type ReconcileGitHub struct {
 	client.Client
 	scheme   *runtime.Scheme
 	ghClient gh.GitHubClientInterface
 }
 
-// Reconcile reads that state of the cluster for a GitHub object and makes changes based on the state read
-// and what is in the GitHub.Spec
+// Reconcile reads that state of the cluster for a GitHubRepository object and makes changes based on the state read
+// and what is in the GitHubRepository.Spec
 // TODO(user): Modify this Reconcile function to implement your Controller logic.  The scaffolding writes
 // a Deployment as an example
 // Automatically generate RBAC rules to allow the Controller to read and write Deployments
@@ -102,7 +102,7 @@ type ReconcileGitHub struct {
 func (r *ReconcileGitHub) Reconcile(request reconcile.Request) (reconcile.Result, error) {
 	fmt.Println("Reconcile")
 
-	instance := &showksv1beta1.GitHub{}
+	instance := &showksv1beta1.GitHubRepository{}
 	err := r.Get(context.TODO(), request.NamespacedName, instance)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -119,11 +119,11 @@ func (r *ReconcileGitHub) Reconcile(request reconcile.Request) (reconcile.Result
 		return r.runFinalizer(instance)
 	}
 
-	_, err = r.ghClient.GetRepository(instance.Spec.Repository.Org, instance.Spec.Repository.Name)
+	_, err = r.ghClient.GetRepository(instance.Spec.Org, instance.Spec.Name)
 	if err != nil {
 		if _, ok := err.(*gh.NotFoundError); ok {
-			repoSpec := &github.Repository{Name: &instance.Spec.Repository.Name}
-			repo, err := r.ghClient.CreateRepository(instance.Spec.Repository.Org, repoSpec)
+			repoSpec := &github.Repository{Name: &instance.Spec.Name}
+			repo, err := r.ghClient.CreateRepository(instance.Spec.Org, repoSpec)
 			if err != nil {
 				return reconcile.Result{}, err
 			}
@@ -156,7 +156,7 @@ func (r *ReconcileGitHub) Reconcile(request reconcile.Request) (reconcile.Result
 	return reconcile.Result{}, nil
 }
 
-func (r *ReconcileGitHub) setFinalizer(instance *showksv1beta1.GitHub) error {
+func (r *ReconcileGitHub) setFinalizer(instance *showksv1beta1.GitHubRepository) error {
 	fmt.Println("setFinalizer")
 	if !containsString(instance.ObjectMeta.Finalizers, finalizerName) {
 		instance.ObjectMeta.Finalizers = append(instance.ObjectMeta.Finalizers, finalizerName)
@@ -168,7 +168,7 @@ func (r *ReconcileGitHub) setFinalizer(instance *showksv1beta1.GitHub) error {
 	return nil
 }
 
-func (r *ReconcileGitHub) runFinalizer(instannce *showksv1beta1.GitHub) (reconcile.Result, error) {
+func (r *ReconcileGitHub) runFinalizer(instannce *showksv1beta1.GitHubRepository) (reconcile.Result, error) {
 	fmt.Println("runFinalizer")
 	if containsString(instannce.ObjectMeta.Finalizers, finalizerName) {
 		if err := r.deleteExternalDependency(instannce); err != nil {
@@ -184,16 +184,16 @@ func (r *ReconcileGitHub) runFinalizer(instannce *showksv1beta1.GitHub) (reconci
 	return reconcile.Result{}, nil
 }
 
-func (r *ReconcileGitHub) deleteExternalDependency(instance *showksv1beta1.GitHub) error {
+func (r *ReconcileGitHub) deleteExternalDependency(instance *showksv1beta1.GitHubRepository) error {
 	fmt.Println("deleteExternalDependency")
-	return r.ghClient.DeleteRepository(instance.Spec.Repository.Org, instance.Spec.Repository.Name)
+	return r.ghClient.DeleteRepository(instance.Spec.Org, instance.Spec.Name)
 }
 
-func (r *ReconcileGitHub) ReconcileCollaborators(instance *showksv1beta1.GitHub) error {
-	for _, collaborator := range instance.Spec.Repository.Collaborators {
-		_, err := r.ghClient.GetPermissionLevel(instance.Spec.Repository.Org, instance.Spec.Repository.Name, collaborator.Name)
+func (r *ReconcileGitHub) ReconcileCollaborators(instance *showksv1beta1.GitHubRepository) error {
+	for _, collaborator := range instance.Spec.Collaborators {
+		_, err := r.ghClient.GetPermissionLevel(instance.Spec.Org, instance.Spec.Name, collaborator.Name)
 		if _, ok := err.(*gh.NotFoundError); ok {
-			err = r.ghClient.AddCollaborator(instance.Spec.Repository.Org, instance.Spec.Repository.Name, collaborator.Name, collaborator.Permission)
+			err = r.ghClient.AddCollaborator(instance.Spec.Org, instance.Spec.Name, collaborator.Name, collaborator.Permission)
 			if err != nil {
 				return err
 			}
@@ -206,10 +206,10 @@ func (r *ReconcileGitHub) ReconcileCollaborators(instance *showksv1beta1.GitHub)
 	return nil
 }
 
-func (r *ReconcileGitHub) ReconcileBranchProtection(instance *showksv1beta1.GitHub) error {
+func (r *ReconcileGitHub) ReconcileBranchProtection(instance *showksv1beta1.GitHubRepository) error {
 	log.Info("Reconcile: BranchProtection")
-	owner := instance.Spec.Repository.Org
-	repo := instance.Spec.Repository.Name
+	owner := instance.Spec.Org
+	repo := instance.Spec.Name
 	for _, bpSpec := range instance.Spec.BranchProtections {
 		bp := &github.ProtectionRequest{
 			RequiredStatusChecks: &github.RequiredStatusChecks{
@@ -236,10 +236,10 @@ func (r *ReconcileGitHub) ReconcileBranchProtection(instance *showksv1beta1.GitH
 
 // リポジトリに同じURLのWebHookがなければ作成、あれば更新する
 // リポジトリにあってSpecにないWebHookは削除する
-func (r *ReconcileGitHub) ReconcileWebHook(instance *showksv1beta1.GitHub) error {
+func (r *ReconcileGitHub) ReconcileWebHook(instance *showksv1beta1.GitHubRepository) error {
 	log.Info("Reconcile: WebHook")
-	owner := instance.Spec.Repository.Org
-	repo := instance.Spec.Repository.Name
+	owner := instance.Spec.Org
+	repo := instance.Spec.Name
 
 	existsHooks, err := r.ghClient.ListHook(owner, repo)
 	if err != nil {
