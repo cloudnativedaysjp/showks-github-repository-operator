@@ -3,6 +3,8 @@ package gh
 import (
 	"context"
 	"github.com/google/go-github/github"
+	"golang.org/x/oauth2"
+	"os"
 )
 
 type GitHubClientInterface interface {
@@ -16,7 +18,13 @@ type GitHubClientInterface interface {
 }
 
 func NewClient() GitHubClientInterface {
-	c := github.NewClient(nil)
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+
+	c := github.NewClient(tc)
 	return &GithubClient{client: c}
 }
 
