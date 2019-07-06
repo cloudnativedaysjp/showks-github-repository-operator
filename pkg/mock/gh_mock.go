@@ -194,3 +194,18 @@ func (mr *MockGitHubClientInterfaceMockRecorder) DeleteHook(owner, repo, id inte
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteHook", reflect.TypeOf((*MockGitHubClientInterface)(nil).DeleteHook), owner, repo, id)
 }
+
+// GetUser mocks base method
+func (m *MockGitHubClientInterface) GetUser(user string) (*github.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUser", user)
+	ret0, _ := ret[0].(*github.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUser indicates an expected call of GetUser
+func (mr *MockGitHubClientInterfaceMockRecorder) GetUser(user interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockGitHubClientInterface)(nil).GetUser), user)
+}

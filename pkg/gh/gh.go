@@ -1,9 +1,9 @@
 package gh
 
 import (
-	"context"
 	"github.com/cloudnativedaysjp/showks-github-repository-operator/pkg/apis/showks/v1beta1"
 	"github.com/google/go-github/github"
+	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"gopkg.in/src-d/go-billy.v4/memfs"
 	"gopkg.in/src-d/go-git.v4"
@@ -25,6 +25,7 @@ type GitHubClientInterface interface {
 	CreateHook(owner string, repo string, hook *github.Hook) (*github.Hook, error)
 	UpdateHook(owner string, repo string, id int64, hook *github.Hook) (*github.Hook, error)
 	DeleteHook(owner string, repo string, id int64) error
+	GetUser(user string) (*github.User, error)
 }
 
 func NewClient() GitHubClientInterface {
@@ -76,8 +77,12 @@ func (c *GithubClient) InitializeRepository(rt v1beta1.RepositoryTemplateSpec) e
 	f := memfs.New()
 	githubToken := os.Getenv("GITHUB_TOKEN")
 
+	user, err := c.GetUser("")
+	if err != nil {
+		return err
+	}
 	repo, err := git.Clone(memory.NewStorage(), f, &git.CloneOptions{
-		URL:           "https://takaishi:" + githubToken + "@github.com/containerdaysjp/showks-canvas.git",
+		URL:           "https://" + *user.Name + ":" + githubToken + "@github.com/containerdaysjp/showks-canvas.git",
 		ReferenceName: plumbing.ReferenceName("refs/heads/master"),
 	})
 	if err != nil {
@@ -91,7 +96,7 @@ func (c *GithubClient) InitializeRepository(rt v1beta1.RepositoryTemplateSpec) e
 
 	_, err = repo.CreateRemote(&config.RemoteConfig{
 		Name: "origin",
-		URLs: []string{"https://takaishi:" + githubToken + "@github.com/" + org + "/" + name + ".git"},
+		URLs: []string{"https://" + *user.Name + ":" + githubToken + "@github.com/" + org + "/" + name + ".git"},
 	})
 	if err != nil {
 		return err
@@ -177,6 +182,14 @@ func (c *GithubClient) DeleteHook(owner string, repo string, id int64) error {
 	}
 
 	return nil
+}
+
+func (c *GithubClient) GetUser(name string) (*github.User, error) {
+	user, _, err := c.client.Users.Get(context.Background(), name)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
 }
 
 type NotFoundError struct {
