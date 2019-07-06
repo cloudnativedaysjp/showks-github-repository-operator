@@ -128,6 +128,11 @@ func (r *ReconcileGitHub) Reconcile(request reconcile.Request) (reconcile.Result
 				return reconcile.Result{}, err
 			}
 
+			err = r.ghClient.InitializeRepository(instance.Spec.RepositoryTemplate)
+			if err != nil {
+				return reconcile.Result{}, err
+			}
+
 			instance.Status.ID = *repo.ID
 
 			if err := r.Status().Update(context.Background(), instance); err != nil {

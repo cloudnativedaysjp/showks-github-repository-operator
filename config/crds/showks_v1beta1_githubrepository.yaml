@@ -79,6 +79,20 @@ spec:
               description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
                 Important: Run "make" to regenerate code after modifying this file'
               type: string
+            template:
+              properties:
+                initialBranches:
+                  items:
+                    type: string
+                  type: array
+                name:
+                  type: string
+                org:
+                  type: string
+              required:
+              - org
+              - name
+              type: object
             webhooks:
               items:
                 properties:

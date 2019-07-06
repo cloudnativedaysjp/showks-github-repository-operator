@@ -5,6 +5,7 @@
 package mock_gh
 
 import (
+	v1beta1 "github.com/cloudnativedaysjp/showks-github-repository-operator/pkg/apis/showks/v1beta1"
 	gomock "github.com/golang/mock/gomock"
 	github "github.com/google/go-github/github"
 	reflect "reflect"
@@ -75,6 +76,20 @@ func (m *MockGitHubClientInterface) GetRepository(org, repo string) (*github.Rep
 func (mr *MockGitHubClientInterfaceMockRecorder) GetRepository(org, repo interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRepository", reflect.TypeOf((*MockGitHubClientInterface)(nil).GetRepository), org, repo)
+}
+
+// InitializeRepository mocks base method
+func (m *MockGitHubClientInterface) InitializeRepository(rt v1beta1.RepositoryTemplateSpec) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InitializeRepository", rt)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// InitializeRepository indicates an expected call of InitializeRepository
+func (mr *MockGitHubClientInterfaceMockRecorder) InitializeRepository(rt interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InitializeRepository", reflect.TypeOf((*MockGitHubClientInterface)(nil).InitializeRepository), rt)
 }
 
 // AddCollaborator mocks base method
