@@ -27,11 +27,18 @@ import (
 type GitHubRepositorySpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-	Org               string                 `json:"org"`
-	Name              string                 `json:"name"`
-	BranchProtections []BranchProtectionSpec `json:"branchProtections,omitempty"`
-	Webhooks          []WebhookSpec          `json:"webhooks,omitempty"`
-	Collaborators     []CollaboratorSpec     `json:"collaborators,omitempty"`
+	Org                string                 `json:"org"`
+	Name               string                 `json:"name"`
+	BranchProtections  []BranchProtectionSpec `json:"branchProtections,omitempty"`
+	Webhooks           []WebhookSpec          `json:"webhooks,omitempty"`
+	Collaborators      []CollaboratorSpec     `json:"collaborators,omitempty"`
+	RepositoryTemplate RepositoryTemplateSpec `json:"template,omitempty"`
+}
+
+type RepositoryTemplateSpec struct {
+	Org             string   `json:"org"`
+	Name            string   `json:"name"`
+	InitialBranches []string `json:"initialBranches,omitempty"`
 }
 
 type CollaboratorSpec struct {

@@ -1,9 +1,15 @@
 package gh
 
 import (
-	"context"
+	"github.com/cloudnativedaysjp/showks-github-repository-operator/pkg/apis/showks/v1beta1"
 	"github.com/google/go-github/github"
+	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
+	"gopkg.in/src-d/go-billy.v4/memfs"
+	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/config"
+	"gopkg.in/src-d/go-git.v4/plumbing"
+	"gopkg.in/src-d/go-git.v4/storage/memory"
 	"os"
 )
 
@@ -11,6 +17,7 @@ type GitHubClientInterface interface {
 	CreateRepository(org string, repo *github.Repository) (*github.Repository, error)
 	DeleteRepository(org string, repo string) error
 	GetRepository(org string, repo string) (*github.Repository, error)
+	InitializeRepository(rt v1beta1.RepositoryTemplateSpec) error
 	AddCollaborator(owner string, repo string, user string, permission string) error
 	GetPermissionLevel(owner string, repo string, user string) (string, error)
 	UpdateBranchProtection(owner string, repo string, branch string, request *github.ProtectionRequest) (*github.Protection, error)
@@ -18,6 +25,7 @@ type GitHubClientInterface interface {
 	CreateHook(owner string, repo string, hook *github.Hook) (*github.Hook, error)
 	UpdateHook(owner string, repo string, id int64, hook *github.Hook) (*github.Hook, error)
 	DeleteHook(owner string, repo string, id int64) error
+	GetUser(user string) (*github.User, error)
 }
 
 func NewClient() GitHubClientInterface {
@@ -61,6 +69,50 @@ func (c *GithubClient) GetRepository(org string, repoName string) (*github.Repos
 	}
 
 	return repo, err
+}
+
+func (c *GithubClient) InitializeRepository(rt v1beta1.RepositoryTemplateSpec) error {
+	org := rt.Org
+	name := rt.Name
+	f := memfs.New()
+	githubToken := os.Getenv("GITHUB_TOKEN")
+
+	user, err := c.GetUser("")
+	if err != nil {
+		return err
+	}
+	repo, err := git.Clone(memory.NewStorage(), f, &git.CloneOptions{
+		URL:           "https://" + *user.Name + ":" + githubToken + "@github.com/containerdaysjp/showks-canvas.git",
+		ReferenceName: plumbing.ReferenceName("refs/heads/master"),
+	})
+	if err != nil {
+		return err
+	}
+
+	err = repo.DeleteRemote("origin")
+	if err != nil {
+		return err
+	}
+
+	_, err = repo.CreateRemote(&config.RemoteConfig{
+		Name: "origin",
+		URLs: []string{"https://" + *user.Name + ":" + githubToken + "@github.com/" + org + "/" + name + ".git"},
+	})
+	if err != nil {
+		return err
+	}
+
+	for _, ib := range rt.InitialBranches {
+		err = repo.Push(&git.PushOptions{
+			RemoteName: "origin",
+			RefSpecs:   []config.RefSpec{config.RefSpec(ib)},
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (c *GithubClient) AddCollaborator(owner string, repo string, user string, permission string) error {
@@ -130,6 +182,14 @@ func (c *GithubClient) DeleteHook(owner string, repo string, id int64) error {
 	}
 
 	return nil
+}
+
+func (c *GithubClient) GetUser(name string) (*github.User, error) {
+	user, _, err := c.client.Users.Get(context.Background(), name)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
 }
 
 type NotFoundError struct {
