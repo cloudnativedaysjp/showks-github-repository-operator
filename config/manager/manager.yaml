@@ -54,6 +54,10 @@ spec:
                 fieldPath: metadata.namespace
           - name: SECRET_NAME
             value: $(WEBHOOK_SECRET_NAME)
+          - name: GITHUB_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: controller-manager
         resources:
           limits:
             cpu: 100m
