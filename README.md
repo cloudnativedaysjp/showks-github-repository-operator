@@ -10,7 +10,7 @@ $ echo "GITHUB_TOKEN=xxxxxxxxxxz" > ./config/secret.env
 $ make deploy
 ```
 
-##sage
+## Usage
 
 ```yaml
 apiVersion: showks.cloudnativedays.jp/v1beta1
