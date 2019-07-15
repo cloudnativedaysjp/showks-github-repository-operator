@@ -1,6 +1,6 @@
 
 # Image URL to use all building/pushing image targets
-IMG ?= rtakaishi/github-repository-operator:latest
+IMG ?= cloudnativedaysjp/github-repository-operator:latest
 
 all: test manager
 
