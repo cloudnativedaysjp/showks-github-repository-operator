@@ -27,7 +27,7 @@ rules:
 - apiGroups:
   - showks.cloudnativedays.jp
   resources:
-  - githubs
+  - githubrepositories
   verbs:
   - get
   - list
@@ -39,7 +39,7 @@ rules:
 - apiGroups:
   - showks.cloudnativedays.jp
   resources:
-  - githubs/status
+  - githubrepositories/status
   verbs:
   - get
   - update
