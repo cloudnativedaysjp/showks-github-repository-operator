@@ -58,6 +58,7 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: controller-manager
+                key: GITHUB_TOKEN
         resources:
           limits:
             cpu: 100m
