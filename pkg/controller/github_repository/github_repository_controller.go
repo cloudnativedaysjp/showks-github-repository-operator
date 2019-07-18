@@ -128,7 +128,7 @@ func (r *ReconcileGitHub) Reconcile(request reconcile.Request) (reconcile.Result
 				return reconcile.Result{}, err
 			}
 
-			err = r.ghClient.InitializeRepository(instance.Spec.RepositoryTemplate)
+			err = r.ghClient.InitializeRepository(instance.Spec)
 			if err != nil {
 				return reconcile.Result{}, err
 			}
