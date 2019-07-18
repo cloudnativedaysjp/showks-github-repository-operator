@@ -64,6 +64,10 @@ func (c *GithubClient) GetRepository(org string, repoName string) (*github.Repos
 	ctx := context.Background()
 	repo, resp, err := c.client.Repositories.Get(ctx, org, repoName)
 
+	if err != nil {
+		return nil, err
+	}
+
 	if resp.Response.StatusCode == 404 {
 		return nil, &NotFoundError{}
 	}
