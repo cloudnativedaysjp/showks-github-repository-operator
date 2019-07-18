@@ -9,6 +9,7 @@ import (
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/config"
 	"gopkg.in/src-d/go-git.v4/plumbing"
+	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
 	"gopkg.in/src-d/go-git.v4/storage/memory"
 	"os"
 )
@@ -17,7 +18,7 @@ type GitHubClientInterface interface {
 	CreateRepository(org string, repo *github.Repository) (*github.Repository, error)
 	DeleteRepository(org string, repo string) error
 	GetRepository(org string, repo string) (*github.Repository, error)
-	InitializeRepository(rt v1beta1.RepositoryTemplateSpec) error
+	InitializeRepository(rs v1beta1.GitHubRepositorySpec) error
 	AddCollaborator(owner string, repo string, user string, permission string) error
 	GetPermissionLevel(owner string, repo string, user string) (string, error)
 	UpdateBranchProtection(owner string, repo string, branch string, request *github.ProtectionRequest) (*github.Protection, error)
@@ -64,30 +65,35 @@ func (c *GithubClient) GetRepository(org string, repoName string) (*github.Repos
 	ctx := context.Background()
 	repo, resp, err := c.client.Repositories.Get(ctx, org, repoName)
 
-	if err != nil {
-		return nil, err
+	if err != nil && resp != nil {
+		if resp.Response.StatusCode == 404 {
+			return nil, &NotFoundError{}
+		}
 	}
 
-	if resp.Response.StatusCode == 404 {
-		return nil, &NotFoundError{}
+	if err != nil {
+		return nil, err
 	}
 
 	return repo, err
 }
 
-func (c *GithubClient) InitializeRepository(rt v1beta1.RepositoryTemplateSpec) error {
-	org := rt.Org
-	name := rt.Name
+func (c *GithubClient) InitializeRepository(rs v1beta1.GitHubRepositorySpec) error {
+	org := rs.Org
+	name := rs.Name
 	f := memfs.New()
 	githubToken := os.Getenv("GITHUB_TOKEN")
-
 	user, err := c.GetUser("")
 	if err != nil {
 		return err
 	}
+	auth := &http.BasicAuth{Username: *user.Login, Password: githubToken}
+
+
 	repo, err := git.Clone(memory.NewStorage(), f, &git.CloneOptions{
-		URL:           "https://" + *user.Name + ":" + githubToken + "@github.com/containerdaysjp/showks-canvas.git",
+		URL:           "https://github.com/containerdaysjp/showks-canvas.git",
 		ReferenceName: plumbing.ReferenceName("refs/heads/master"),
+		Auth:          auth,
 	})
 	if err != nil {
 		return err
@@ -100,16 +106,17 @@ func (c *GithubClient) InitializeRepository(rt v1beta1.RepositoryTemplateSpec) e
 
 	_, err = repo.CreateRemote(&config.RemoteConfig{
 		Name: "origin",
-		URLs: []string{"https://" + *user.Name + ":" + githubToken + "@github.com/" + org + "/" + name + ".git"},
+		URLs: []string{"https://github.com/" + org + "/" + name + ".git"},
 	})
 	if err != nil {
 		return err
 	}
 
-	for _, ib := range rt.InitialBranches {
+	for _, ib := range rs.RepositoryTemplate.InitialBranches {
 		err = repo.Push(&git.PushOptions{
 			RemoteName: "origin",
 			RefSpecs:   []config.RefSpec{config.RefSpec(ib)},
+			Auth:       auth,
 		})
 		if err != nil {
 			return err
