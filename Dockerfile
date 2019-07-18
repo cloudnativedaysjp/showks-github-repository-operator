@@ -13,5 +13,6 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o manager github.com/clou
 # Copy the controller-manager into a thin image
 FROM ubuntu:latest
 WORKDIR /
+RUN apt update && apt install -y ca-certificates
 COPY --from=builder /go/src/github.com/cloudnativedaysjp/showks-github-repository-operator/manager .
 ENTRYPOINT ["/manager"]
