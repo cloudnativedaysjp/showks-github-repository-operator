@@ -55,8 +55,45 @@ func newGitHubClientMock(controller *gomock.Controller) gh.GitHubClientInterface
 
 	firstGetRepo := c.EXPECT().GetRepository(org, repoName).Return(nil, &gh.NotFoundError{}).Times(1)
 	c.EXPECT().GetRepository(org, repoName).Return(repoResp, nil).After(firstGetRepo).Times(1)
-	rt := showksv1beta1.RepositoryTemplateSpec{Org: org, Name: repoName, InitialBranches: []string{"refs/heads/master:refs/heads/master"}}
-	c.EXPECT().InitializeRepository(rt).Return(nil).Times(1)
+	rs := showksv1beta1.GitHubRepositorySpec{
+		Org:  org,
+		Name: repoName,
+		RepositoryTemplate: showksv1beta1.RepositoryTemplateSpec{
+			Org:             org,
+			Name:            repoName,
+			InitialBranches: []string{"refs/heads/master:refs/heads/master"},
+		},
+		Collaborators: []showksv1beta1.CollaboratorSpec{
+			{
+				Name:       "alice",
+				Permission: "admin",
+			},
+		},
+		BranchProtections: []showksv1beta1.BranchProtectionSpec{
+			{
+				BranchName: "master",
+				RequiredStatusChecks: showksv1beta1.RequiredStatusChecksSpec{
+					Strict:   false,
+					Contexts: nil,
+				},
+				EnforceAdmin: false,
+				Restrictions: showksv1beta1.RestrictionsSpec{
+					Teams: []string{"showks-members"},
+				},
+			},
+		},
+		Webhooks: []showksv1beta1.WebhookSpec{
+			{
+				Active: true,
+				Config: showksv1beta1.WebhookConfigSpec{
+					Url:         "https://example.com",
+					ContentType: "json",
+				},
+				Events: []string{"push"},
+			},
+		},
+	}
+	c.EXPECT().InitializeRepository(rs).Return(nil).Times(1)
 
 	c.EXPECT().AddCollaborator(org, repoName, "alice", "admin").Return(nil).Times(1)
 	firstGetPermission := c.EXPECT().GetPermissionLevel(org, repoName, "alice").Return("", &gh.NotFoundError{}).Times(1)

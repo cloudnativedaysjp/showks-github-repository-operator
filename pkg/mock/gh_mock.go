@@ -79,17 +79,17 @@ func (mr *MockGitHubClientInterfaceMockRecorder) GetRepository(org, repo interfa
 }
 
 // InitializeRepository mocks base method
-func (m *MockGitHubClientInterface) InitializeRepository(rt v1beta1.RepositoryTemplateSpec) error {
+func (m *MockGitHubClientInterface) InitializeRepository(rs v1beta1.GitHubRepositorySpec) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "InitializeRepository", rt)
+	ret := m.ctrl.Call(m, "InitializeRepository", rs)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // InitializeRepository indicates an expected call of InitializeRepository
-func (mr *MockGitHubClientInterfaceMockRecorder) InitializeRepository(rt interface{}) *gomock.Call {
+func (mr *MockGitHubClientInterfaceMockRecorder) InitializeRepository(rs interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InitializeRepository", reflect.TypeOf((*MockGitHubClientInterface)(nil).InitializeRepository), rt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InitializeRepository", reflect.TypeOf((*MockGitHubClientInterface)(nil).InitializeRepository), rs)
 }
 
 // AddCollaborator mocks base method
