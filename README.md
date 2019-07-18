@@ -20,7 +20,7 @@ metadata:
 spec:
   org: cloudnativedaysjp
   name: showks-canvas-sampleusername
-  repositoryTemplate:
+  template:
     org: containerdaysjp
     name: showks-canvas
     #　テンプレートリポジトリからチェックアウトして作成するブランチを指定します
@@ -33,16 +33,17 @@ spec:
       permission: admin
     - name: bob
       permission: pull
-  branchProtection:
-    enforceAdmins: false
-    requiredPullRequestReviews: nil
-    requiredStatusChecks:
-      strict: true
-      contexts: []
-    restrictions:
-      users: []
-      teams:
-        - showks-members
+  branchProtections:
+    - branchName: master
+      enforceAdmins: false
+      requiredPullRequestReviews: nil
+      requiredStatusChecks:
+        strict: true
+        contexts: []
+      restrictions:
+        users: []
+        teams:
+          - showks-members
   webhooks:
     - name: web
       config:
