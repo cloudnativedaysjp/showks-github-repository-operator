@@ -103,10 +103,11 @@ func newGitHubClientMock(controller *gomock.Controller) gh.GitHubClientInterface
 	protectionReq := &github.ProtectionRequest{
 		RequiredStatusChecks: &github.RequiredStatusChecks{
 			Strict:   false,
-			Contexts: nil,
+			Contexts: []string{},
 		},
 		EnforceAdmins: false,
 		Restrictions: &github.BranchRestrictionsRequest{
+			Users: []string{},
 			Teams: []string{team},
 		},
 	}

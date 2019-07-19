@@ -195,7 +195,9 @@ func (r *ReconcileGitHub) deleteExternalDependency(instance *showksv1beta1.GitHu
 }
 
 func (r *ReconcileGitHub) ReconcileCollaborators(instance *showksv1beta1.GitHubRepository) error {
+	log.Info("Reconcile: Collaborators")
 	for _, collaborator := range instance.Spec.Collaborators {
+		log.Info(fmt.Sprintf("Collaborator: %s", collaborator))
 		_, err := r.ghClient.GetPermissionLevel(instance.Spec.Org, instance.Spec.Name, collaborator.Name)
 		if _, ok := err.(*gh.NotFoundError); ok {
 			err = r.ghClient.AddCollaborator(instance.Spec.Org, instance.Spec.Name, collaborator.Name, collaborator.Permission)
@@ -226,6 +228,14 @@ func (r *ReconcileGitHub) ReconcileBranchProtection(instance *showksv1beta1.GitH
 				Users: bpSpec.Restrictions.Users,
 				Teams: bpSpec.Restrictions.Teams,
 			},
+		}
+
+		if bpSpec.RequiredStatusChecks.Contexts == nil {
+			bp.RequiredStatusChecks.Contexts = []string{}
+		}
+
+		if bpSpec.Restrictions.Users == nil {
+			bp.Restrictions.Users = []string{}
 		}
 
 		log.Info("Updating BranchProtection...", "branch", bpSpec.BranchName)
