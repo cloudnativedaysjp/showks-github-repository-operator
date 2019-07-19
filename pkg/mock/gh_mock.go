@@ -92,6 +92,21 @@ func (mr *MockGitHubClientInterfaceMockRecorder) InitializeRepository(rs interfa
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InitializeRepository", reflect.TypeOf((*MockGitHubClientInterface)(nil).InitializeRepository), rs)
 }
 
+// ListCollaborator mocks base method
+func (m *MockGitHubClientInterface) ListCollaborator(owner, repo string) ([]*github.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListCollaborator", owner, repo)
+	ret0, _ := ret[0].([]*github.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListCollaborator indicates an expected call of ListCollaborator
+func (mr *MockGitHubClientInterfaceMockRecorder) ListCollaborator(owner, repo interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListCollaborator", reflect.TypeOf((*MockGitHubClientInterface)(nil).ListCollaborator), owner, repo)
+}
+
 // AddCollaborator mocks base method
 func (m *MockGitHubClientInterface) AddCollaborator(owner, repo, user, permission string) error {
 	m.ctrl.T.Helper()
@@ -104,6 +119,20 @@ func (m *MockGitHubClientInterface) AddCollaborator(owner, repo, user, permissio
 func (mr *MockGitHubClientInterfaceMockRecorder) AddCollaborator(owner, repo, user, permission interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddCollaborator", reflect.TypeOf((*MockGitHubClientInterface)(nil).AddCollaborator), owner, repo, user, permission)
+}
+
+// RemoveCollaborator mocks base method
+func (m *MockGitHubClientInterface) RemoveCollaborator(owner, repo, user string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveCollaborator", owner, repo, user)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveCollaborator indicates an expected call of RemoveCollaborator
+func (mr *MockGitHubClientInterfaceMockRecorder) RemoveCollaborator(owner, repo, user interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveCollaborator", reflect.TypeOf((*MockGitHubClientInterface)(nil).RemoveCollaborator), owner, repo, user)
 }
 
 // GetPermissionLevel mocks base method

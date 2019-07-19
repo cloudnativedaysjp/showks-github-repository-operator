@@ -95,9 +95,8 @@ func newGitHubClientMock(controller *gomock.Controller) gh.GitHubClientInterface
 	}
 	c.EXPECT().InitializeRepository(rs).Return(nil).Times(1)
 
-	c.EXPECT().AddCollaborator(org, repoName, "alice", "admin").Return(nil).Times(1)
-	firstGetPermission := c.EXPECT().GetPermissionLevel(org, repoName, "alice").Return("", &gh.NotFoundError{}).Times(1)
-	c.EXPECT().GetPermissionLevel(org, repoName, "alice").Return("admin", nil).After(firstGetPermission).Times(1)
+	c.EXPECT().ListCollaborator(org, repoName).Return([]*github.User{}, nil).Times(2)
+	c.EXPECT().AddCollaborator(org, repoName, "alice", "admin").Return(nil).Times(2)
 
 	team := "showks-members"
 	protectionReq := &github.ProtectionRequest{

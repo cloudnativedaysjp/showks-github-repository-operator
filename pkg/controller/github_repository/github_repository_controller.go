@@ -197,19 +197,23 @@ func (r *ReconcileGitHub) deleteExternalDependency(instance *showksv1beta1.GitHu
 func (r *ReconcileGitHub) ReconcileCollaborators(instance *showksv1beta1.GitHubRepository) error {
 	log.Info("Reconcile: Collaborators")
 	for _, collaborator := range instance.Spec.Collaborators {
-		log.Info(fmt.Sprintf("Collaborator: %s", collaborator))
-		_, err := r.ghClient.GetPermissionLevel(instance.Spec.Org, instance.Spec.Name, collaborator.Name)
-		if _, ok := err.(*gh.NotFoundError); ok {
-			err = r.ghClient.AddCollaborator(instance.Spec.Org, instance.Spec.Name, collaborator.Name, collaborator.Permission)
-			if err != nil {
-				return err
-			}
-		} else {
+		users, err := r.ghClient.ListCollaborator(instance.Spec.Org, instance.Spec.Name)
+		if err != nil {
 			return err
-
+		}
+		for _, user := range users {
+			if *user.Login == collaborator.Name {
+				err = r.ghClient.RemoveCollaborator(instance.Spec.Org, instance.Spec.Name, collaborator.Name)
+				if err != nil {
+					return err
+				}
+			}
+		}
+		err = r.ghClient.AddCollaborator(instance.Spec.Org, instance.Spec.Name, collaborator.Name, collaborator.Permission)
+		if err != nil {
+			return err
 		}
 	}
-
 	return nil
 }
 

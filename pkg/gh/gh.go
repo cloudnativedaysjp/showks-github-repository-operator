@@ -19,7 +19,9 @@ type GitHubClientInterface interface {
 	DeleteRepository(org string, repo string) error
 	GetRepository(org string, repo string) (*github.Repository, error)
 	InitializeRepository(rs v1beta1.GitHubRepositorySpec) error
+	ListCollaborator(owner string, repo string) ([]*github.User, error)
 	AddCollaborator(owner string, repo string, user string, permission string) error
+	RemoveCollaborator(owner string, repo string, user string) error
 	GetPermissionLevel(owner string, repo string, user string) (string, error)
 	UpdateBranchProtection(owner string, repo string, branch string, request *github.ProtectionRequest) (*github.Protection, error)
 	ListHook(owner string, repo string) ([]*github.Hook, error)
@@ -125,10 +127,26 @@ func (c *GithubClient) InitializeRepository(rs v1beta1.GitHubRepositorySpec) err
 	return nil
 }
 
+func (c *GithubClient) ListCollaborator(owner string, repo string) ([]*github.User, error) {
+	opt := &github.ListCollaboratorsOptions{}
+	ctx := context.Background()
+	users, _, err := c.client.Repositories.ListCollaborators(ctx, owner, repo, opt)
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
 func (c *GithubClient) AddCollaborator(owner string, repo string, user string, permission string) error {
 	opt := &github.RepositoryAddCollaboratorOptions{Permission: permission}
 	ctx := context.Background()
 	_, err := c.client.Repositories.AddCollaborator(ctx, owner, repo, user, opt)
+	return err
+}
+
+func (c *GithubClient) RemoveCollaborator(owner string, repo string, user string) error {
+	ctx := context.Background()
+	_, err := c.client.Repositories.RemoveCollaborator(ctx, owner, repo, user)
 	return err
 }
 
