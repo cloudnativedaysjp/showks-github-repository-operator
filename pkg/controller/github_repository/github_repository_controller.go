@@ -191,6 +191,13 @@ func (r *ReconcileGitHub) runFinalizer(instannce *showksv1beta1.GitHubRepository
 
 func (r *ReconcileGitHub) deleteExternalDependency(instance *showksv1beta1.GitHubRepository) error {
 	fmt.Println("deleteExternalDependency")
+	_, err := r.ghClient.GetRepository(instance.Spec.Org, instance.Spec.Name)
+	if err != nil {
+		if _, ok := err.(*gh.NotFoundError); ok {
+			return nil
+		}
+		return err
+	}
 	return r.ghClient.DeleteRepository(instance.Spec.Org, instance.Spec.Name)
 }
 
