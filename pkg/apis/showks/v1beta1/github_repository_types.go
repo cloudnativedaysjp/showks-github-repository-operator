@@ -40,8 +40,8 @@ type RepositoryTemplateSpec struct {
 	Name            string           `json:"name"`
 	InitialBranches []string         `json:"initialBranches,omitempty"`
 	InitialCommits  []InitialCommits `json:"initialCommits,omitempty"`
-	Username        string           `json:"username"`
-	Email           string           `json:"email"`
+	Username        string           `json:"username,omitempty"`
+	Email           string           `json:"email,omitempty"`
 }
 
 type InitialCommits struct {
