@@ -54,7 +54,8 @@ func newGitHubClientMock(controller *gomock.Controller) gh.GitHubClientInterface
 	c.EXPECT().DeleteRepository(org, repoName).Return(nil).Times(1)
 
 	firstGetRepo := c.EXPECT().GetRepository(org, repoName).Return(nil, &gh.NotFoundError{}).Times(1)
-	c.EXPECT().GetRepository(org, repoName).Return(repoResp, nil).After(firstGetRepo).Times(1)
+	secondGetRepo := c.EXPECT().GetRepository(org, repoName).Return(repoResp, nil).After(firstGetRepo).Times(1)
+	c.EXPECT().GetRepository(org, repoName).Return(repoResp, nil).After(secondGetRepo).Times(1)
 	rs := showksv1beta1.GitHubRepositorySpec{
 		Org:  org,
 		Name: repoName,
