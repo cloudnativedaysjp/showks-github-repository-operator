@@ -1,17 +1,22 @@
 package gh
 
 import (
+	"fmt"
 	"github.com/cloudnativedaysjp/showks-github-repository-operator/pkg/apis/showks/v1beta1"
 	"github.com/google/go-github/github"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"gopkg.in/src-d/go-billy.v4/memfs"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/config"
 	"gopkg.in/src-d/go-git.v4/plumbing"
+	"gopkg.in/src-d/go-git.v4/plumbing/object"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
 	"gopkg.in/src-d/go-git.v4/storage/memory"
+	"io"
 	"os"
+	"time"
 )
 
 type GitHubClientInterface interface {
@@ -113,6 +118,42 @@ func (c *GithubClient) InitializeRepository(rs v1beta1.GitHubRepositorySpec) err
 		return err
 	}
 
+	for _, ic := range rs.RepositoryTemplate.InitialCommits {
+		a, err := f.Create(ic.Path)
+		if err != nil {
+			return errors.Wrapf(err, "Faield to f.Create")
+		}
+		defer a.Close()
+		fmt.Printf("contents: %s\n", ic.Contents)
+		_, err = io.WriteString(a, ic.Contents)
+		if err != nil {
+			return errors.Wrapf(err, "Faield to Copy")
+		}
+		a.Close()
+
+		w, err := repo.Worktree()
+		if err != nil {
+			return errors.Wrapf(err, "Failed to Worktree")
+		}
+
+		_, err = w.Add(ic.Path)
+		if err != nil {
+			return errors.Wrapf(err, "Failed to Add")
+		}
+
+		_, err = w.Commit(fmt.Sprintf("Add %s", ic.Path), &git.CommitOptions{
+			Author: &object.Signature{
+				Name:  rs.RepositoryTemplate.Username,
+				Email: rs.RepositoryTemplate.Email,
+				When:  time.Now(),
+			},
+		})
+
+		if err != nil {
+			return errors.Wrapf(err, "Failed to Commit")
+		}
+	}
+
 	for _, ib := range rs.RepositoryTemplate.InitialBranches {
 		err = repo.Push(&git.PushOptions{
 			RemoteName: "origin",
@@ -120,7 +161,7 @@ func (c *GithubClient) InitializeRepository(rs v1beta1.GitHubRepositorySpec) err
 			Auth:       auth,
 		})
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "Failed to Push")
 		}
 	}
 

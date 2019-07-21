@@ -28,6 +28,11 @@ spec:
       - refs/heads/master:refs/heads/master
       - refs/heads/master:refs/heads/staging
       - refs/heads/master:refs/heads/feature
+    initialCommits:
+      - path: hoge
+        contents: piyo
+    username: showks
+    email: hoge@example.com
   collaborators:
     - name: alice
       permission: admin

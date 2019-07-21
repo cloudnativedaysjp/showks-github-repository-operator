@@ -36,9 +36,17 @@ type GitHubRepositorySpec struct {
 }
 
 type RepositoryTemplateSpec struct {
-	Org             string   `json:"org"`
-	Name            string   `json:"name"`
-	InitialBranches []string `json:"initialBranches,omitempty"`
+	Org             string           `json:"org"`
+	Name            string           `json:"name"`
+	InitialBranches []string         `json:"initialBranches,omitempty"`
+	InitialCommits  []InitialCommits `json:"initialCommits,omitempty"`
+	Username        string           `json:"username"`
+	Email           string           `json:"email"`
+}
+
+type InitialCommits struct {
+	Path     string `json:"path"`
+	Contents string `json:"contents"`
 }
 
 type CollaboratorSpec struct {
