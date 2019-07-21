@@ -22,8 +22,9 @@ import (
 	showksv1beta1 "github.com/cloudnativedaysjp/showks-github-repository-operator/pkg/apis/showks/v1beta1"
 	"github.com/cloudnativedaysjp/showks-github-repository-operator/pkg/gh"
 	"github.com/google/go-github/github"
+	"github.com/pkg/errors"
 	appsv1 "k8s.io/api/apps/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
+	machinaryerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -105,7 +106,7 @@ func (r *ReconcileGitHub) Reconcile(request reconcile.Request) (reconcile.Result
 	instance := &showksv1beta1.GitHubRepository{}
 	err := r.Get(context.TODO(), request.NamespacedName, instance)
 	if err != nil {
-		if errors.IsNotFound(err) {
+		if machinaryerrors.IsNotFound(err) {
 			return reconcile.Result{}, nil
 		}
 		return reconcile.Result{}, err
@@ -125,39 +126,40 @@ func (r *ReconcileGitHub) Reconcile(request reconcile.Request) (reconcile.Result
 			repoSpec := &github.Repository{Name: &instance.Spec.Name}
 			repo, err := r.ghClient.CreateRepository(instance.Spec.Org, repoSpec)
 			if err != nil {
-				return reconcile.Result{}, err
+				return reconcile.Result{}, errors.Wrapf(err, "Failed to CreateRepository %s/%s", instance.Spec.Org, instance.Spec.Name)
 			}
 
 			err = r.ghClient.InitializeRepository(instance.Spec)
 			if err != nil {
-				return reconcile.Result{}, err
+				return reconcile.Result{}, errors.Wrapf(err, "Failed to InitializeRepository %s/%s", instance.Spec.Org, instance.Spec.Name)
 			}
 
 			instance.Status.ID = *repo.ID
 
 			if err := r.Status().Update(context.Background(), instance); err != nil {
-				return reconcile.Result{}, err
+				return reconcile.Result{}, errors.Wrapf(err, "Failed to update status %s", instance.Name)
 			}
 		} else {
-			return reconcile.Result{}, err
+			return reconcile.Result{}, errors.Wrapf(err, "Failed to GetRepository")
 		}
 	}
 
 	err = r.ReconcileCollaborators(instance)
 	if err != nil {
-		return reconcile.Result{}, err
+		return reconcile.Result{}, errors.Wrapf(err, "Failed to ReconcileCollaborators")
 	}
 
 	err = r.ReconcileBranchProtection(instance)
 	if err != nil {
-		return reconcile.Result{}, err
+		return reconcile.Result{}, errors.Wrapf(err, "Failed to ReconcileBranchProtection")
 	}
 
 	err = r.ReconcileWebHook(instance)
 	if err != nil {
-		return reconcile.Result{}, err
+		return reconcile.Result{}, errors.Wrapf(err, "Failed to ReconcileWebHook")
 	}
 
+	log.Info("Finished to Reconcile", "name", instance.Name)
 	return reconcile.Result{}, nil
 }
 
