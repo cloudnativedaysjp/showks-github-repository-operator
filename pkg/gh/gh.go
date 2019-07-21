@@ -92,7 +92,7 @@ func (c *GithubClient) InitializeRepository(rs v1beta1.GitHubRepositorySpec) err
 	auth := &http.BasicAuth{Username: *user.Login, Password: githubToken}
 
 	repo, err := git.Clone(memory.NewStorage(), f, &git.CloneOptions{
-		URL:           "https://github.com/" + org + "/" + name + ".git",
+		URL:           "https://github.com/" + rs.RepositoryTemplate.Org + "/" + rs.RepositoryTemplate.Name + ".git",
 		ReferenceName: plumbing.ReferenceName("refs/heads/master"),
 		Auth:          auth,
 	})
