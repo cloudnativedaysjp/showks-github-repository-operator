@@ -196,7 +196,7 @@ func (r *ReconcileGitHub) deleteExternalDependency(instance *showksv1beta1.GitHu
 		if _, ok := err.(*gh.NotFoundError); ok {
 			return nil
 		}
-		return nil
+		return err
 	}
 	return r.ghClient.DeleteRepository(instance.Spec.Org, instance.Spec.Name)
 }
