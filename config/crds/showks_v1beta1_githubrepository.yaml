@@ -81,17 +81,35 @@ spec:
               type: string
             template:
               properties:
+                email:
+                  type: string
                 initialBranches:
                   items:
                     type: string
+                  type: array
+                initialCommits:
+                  items:
+                    properties:
+                      contents:
+                        type: string
+                      path:
+                        type: string
+                    required:
+                    - path
+                    - contents
+                    type: object
                   type: array
                 name:
                   type: string
                 org:
                   type: string
+                username:
+                  type: string
               required:
               - org
               - name
+              - username
+              - email
               type: object
             webhooks:
               items:
