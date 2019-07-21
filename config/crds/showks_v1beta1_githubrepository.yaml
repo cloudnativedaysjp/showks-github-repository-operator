@@ -108,8 +108,6 @@ spec:
               required:
               - org
               - name
-              - username
-              - email
               type: object
             webhooks:
               items:
